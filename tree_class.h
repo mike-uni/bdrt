@@ -16,6 +16,7 @@ using namespace Eigen;
 class Tree {
 	public:
 		Node * root;
+		int tname;
 		double prior = 1.0;
 		double prop_new = 0.0;
 		double prop_current = 0.0;
@@ -223,17 +224,30 @@ void Tree::find_int_nodes(Node * leaf, vector<int>& intvec) {
 		}
   	}
 }
-
+/*
 void Tree::find_post(Node * leaf) {
-	double mypost = get_post();
- 	if (leaf != NULL) {
-		if (leaf->isleaf) {
-    		mypost = mypost+leaf->lpost;
+	vector<int> lnodes;
+	find_leaf_nodes(leaf, lnodes);
+	for (int i = 0; i < lnodes.size(); i++) {
+		find_node
+}
+*/
+void Tree:: find_post(Node * leaf) {
+	double mypost = get_post(); 
+	if (leaf != NULL) {
+		if (leaf->isleaf == true) {
+			mypost = mypost + leaf->lpost;
 			set_post(mypost);
-  		} 
-    	find_post(leaf->left);
+			cout << "isleaf is true and tree_post is: " << mypost << endl;
+		}
+		else {
+			mypost = mypost;
+			set_post(mypost);
+			cout << "isleaf is false and tree_post is: " << mypost << endl;
+		}
+		find_post(leaf->left);
 		find_post(leaf->right);
-  	}	
+	}
 }
 
 void Tree:: find_nnodes(Node * leaf, vector<int>& outvec) {
@@ -281,18 +295,21 @@ int Tree:: nleaves(Node * leaf){
 void Tree:: display(Node * leaf) {
 	if (leaf != NULL) {
 		cout << "The leaf nnode is: " << leaf->nnode << endl; 
+		cout << "isleaf is: " << leaf->isleaf << endl; 
 		//				<< " at leaf address " << leaf << endl;
-		cout << "The split is: " << leaf->split << endl;
-		cout << "The pred is: " << leaf->pred << endl;
+		//cout << "The split is: " << leaf->split << endl;
+		//cout << "The pred is: " << leaf->pred << endl;
 		//cout << "The psplit is: " << leaf->psplit << endl;
-		if (leaf->parent == nullptr) {
-			cout << "leaf parent is nullptr\n";
-		}
-		else {
-			cout << "Parent nnode is " << leaf->parent->nnode << endl;
-		}
-		cout << "The parent address is: " << leaf->parent << endl;
+		//if (leaf->parent == nullptr) {
+		//	cout << "leaf parent is nullptr\n";
+		//}
+		//else {
+		//	cout << "Parent nnode is " << leaf->parent->nnode << endl;
+		//}
+		//cout << "The parent address is: " << leaf->parent << endl;
 		//				" at address" << leaf->parent << endl;
+		cout << "lpost is: " << leaf->lpost << endl;
+		cout << "ppost is: " << leaf->ppost << endl;
 
 		display(leaf->left);
 		display(leaf->right);

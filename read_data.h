@@ -136,6 +136,22 @@ void sim_x(const int P, string filename, int stop) {
 	}
 }
 
+void sim_normx(const int P, string filename, int stop, double var) {
+	Dist d;
+	ofstream outfile;
+	outfile.open(filename);
+	double rand_doub;
+	int n = 0;
+	while (n < stop) {
+		for (int i = 1; i < (P+1); i++) {
+			rand_doub = d.rnorm(i, var);
+			outfile << rand_doub << " ";
+		}
+	outfile << "\n";
+	n++;	
+	}
+}
+
 // A function to count the number of words in a string
 int wordcount(string s) {
 	int count = 0;
@@ -181,6 +197,22 @@ void get_exts(const string& path, const string& ext) {
 	closedir(dir);
 }
 
+// A function to search a directory and delete all the files within.
+void del_files(const string& path) {
+	DIR * dir = opendir(path.c_str());
+	char filepath[1000];
+	if (!dir) {
+		cout << "Directory not found." << endl;
+	}
+	dirent * entry;
+	while ((entry = readdir(dir)) != NULL) {
+		sprintf(filepath, "%s/%s", path.c_str(), entry->d_name);
+		remove(filepath); 
+	}
+	cout << "The folder is empty." << endl;
+	closedir(dir);
+}
+
 /*
 // Simulate a response based on the Friedman function
 void sim_f(string filename, int stop, int d, 
@@ -191,21 +223,29 @@ void sim_f(string filename, int stop, int d,
 
 
 int main() {
-	string mpath = get_wd();
-	get_exts(mpath, ".cfg");
-}
+	//string mpath = get_wd();
+	//get_exts(mpath, ".cfg");
 
-	bool test = fexists(".cpp");
-	cout << test << endl;
-	string fileloc = "/home/michael/Desktop/180416_cpp/output/xsim.txt";
-	sim_x(10, fileloc, 10);
-	ifstream ifs(fileloc, ios::in);	
-	VectorXd dataLine = read_line(0, 10, ifs);
-	Dist d(1234);
+	//bool test = fexists(".cpp");
+	//cout << test << endl;
+	//string fileloc = "/home/michael/Desktop/180416_cpp/output/xsim.txt";
+	//sim_x(10, fileloc, 10);
+	//ifstream ifs(fileloc, ios::in);	
+	//VectorXd dataLine = read_line(0, 10, ifs);
+	Vector2d mu_;
+	mu_ << 0,0;
+	Matrix2d sig_;
+	sig_<< 1,0,0,1;//A_*A_.transpose();
+	cout << "sig is: " << endl << sig_ << endl;
+	int n_ = 1;
+	MatrixXd mvn_;
+	Dist d;
 	int i = 0;
 	while (i<10) {
 	int randn = d.runif(0, 10);
 	cout << randn << endl;
+	mvn_ = d.mvn(n_, mu_, sig_);
+	cout << "MVN test is: " << endl << mvn_ << endl; 
 	i++;
 	}
 	int randn2 = d.runif(0, 10);
@@ -249,15 +289,6 @@ int main() {
 	cout << "Index of pred is: " << myind << endl;
 	cout << "Value of split is: " << dataLine[myind] << endl;
 
-	Vector2d mu_;
-	mu_ << 0,0;
-	Matrix2d sig_;
-	sig_<< 1,0,0,1;//A_*A_.transpose();
-	cout << "sig is: " << endl << sig_ << endl;
-	int n_ = 5;
-	MatrixXd mvn_;
-	mvn_ = mvn(n_, mu_, sig_);
-	cout << "MVN test is: " << endl << mvn_ << endl; 
 
 
 	MatrixXd A_mat = MatrixXd::Zero(2, 10);

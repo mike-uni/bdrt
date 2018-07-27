@@ -19,31 +19,14 @@ class Prop {
 					const vector<int> leaf_nodes,
 					const double ALPH, const double BET,
 					double in_rule, const int DIM, vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet);
+					const MatrixXd& data, int iter);
 	void cprop(Tree * tptr, Node * fptr, float const pmove,
 				const vector<int> int_nodes, const int iter,
 				const MatrixXd& data, const vector<string> names);
 	void sprop(Tree * tptr, Node * fptr, float const pmove,
 				const vector<int> int_nodes, const int iter);
 	void pprop(Tree * tptr, Node * fptr, float const pmove,
-					const vector<int> leaf_nodes,
-					const double ALPH, const double BET,
-				 	const int DIM, vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet);
+					const vector<int> leaf_nodes, const int DIM);
 
 };
 
@@ -52,14 +35,7 @@ void Prop::gprop(Tree * tptr, Node * fptr, float const pmove,
 					const double ALPH, const double BET,
 					double in_rule, const int DIM, 
 					const vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet) {
+					const MatrixXd& data, int iter) {
 
 	int num_leaves = leaf_nodes.size();
 	int rand_leaf = leaf_nodes[rand()%num_leaves];
@@ -70,8 +46,7 @@ void Prop::gprop(Tree * tptr, Node * fptr, float const pmove,
 	// Grow the tree
 	Move m;	
 	m.grow(rleaf, ALPH, BET, in_rule, DIM, names, data, 
-			iter, fptr->nnode, WMAT, VMAT, WI, VI, FMAT, HMAT, HVH, 
-			VH, WFT, WF, FWF, yi, Vdet, Wdet);
+			iter); 
 
 	// CALCULATE PROPOSALS 
 	float pleaf;
@@ -91,12 +66,6 @@ void Prop::gprop(Tree * tptr, Node * fptr, float const pmove,
 	tptr->prop_current = prop_gr;
 	//cout << "tptr->prop_new is: " << tptr->prop_new << endl;
 	//cout << "tptr->prop_current is: " << tptr->prop_current << endl;
-
-	// Proposal prior p(T*)
-	tptr->find_prior(tptr->root);		
-
-	// Proposal posterior p(T*)
-	tptr->find_post(tptr->root);		
 }
 	
 void Prop::cprop(Tree * tptr, Node * fptr, float const pmove,
@@ -130,12 +99,6 @@ void Prop::cprop(Tree * tptr, Node * fptr, float const pmove,
 	tptr->prop_current = propch;
 	//cout << "tptr->prop_new is: " << tptr->prop_new << endl;
 	//cout << "tptr->prop_current is: " << tptr->prop_current << endl;
-	
-	// Proposal prior p(T*)
-	tptr->find_prior(tptr->root);
-	
-	// Proposal posterior p(T*)
-	tptr->find_post(tptr->root);		
 }
 
 void Prop::sprop(Tree * tptr, Node * fptr, float const pmove,
@@ -176,27 +139,10 @@ void Prop::sprop(Tree * tptr, Node * fptr, float const pmove,
 	tptr->prop_current = propsw;
 	//cout << "tptr->prop_new is: " << tptr->prop_new << endl;
 	//cout << "tptr->prop_current is: " << tptr->prop_current << endl;
-
-	// Proposal prior p(T*)
-	tptr->find_prior(tptr->root);
-
-	// Proposal posterior p(T*)
-	tptr->find_post(tptr->root);		
 }
 
 void Prop::pprop(Tree * tptr, Node * fptr, float const pmove,
-					const vector<int> int_nodes,
-					const double ALPH, const double BET,
-					const int DIM, 
-					const vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet) {
+					const vector<int> int_nodes, const int DIM) {
 
 	int const num_nodes = int_nodes.size();
 	int const rand_node = int_nodes[rand()%num_nodes];
@@ -220,12 +166,5 @@ void Prop::pprop(Tree * tptr, Node * fptr, float const pmove,
 
 	// Prune
 	Move m;
-	m.prune(rleaf, DIM, data, fptr->nnode, WMAT, VMAT, WI, VI, FMAT, 
-			HMAT, HVH, VH, WFT, WF, FWF, yi, Vdet, Wdet);
-				
-	// Proposal prior p(T*)
-	tptr->find_prior(tptr->root);
-
-	// Proposal posterior p(T*)
-	tptr->find_post(tptr->root);		
+	m.prune(rleaf, DIM); 
 }

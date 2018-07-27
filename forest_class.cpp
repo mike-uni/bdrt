@@ -34,35 +34,29 @@ class Forest {
 	void init_tree(Tree * tptr, Ref<MatrixXd> ATMAT, 
 			Ref<MatrixXd> AIMAT, double ALPHA, double BETA,  
 			Ref<VectorXd> CVEC, Ref<VectorXd> DVEC, double& ppost, 
-			double& lpost, 
+			double& lpost, int tname, 
 			const vector<string> names, const MatrixXd& data, 
 			const VectorXd& MU, const MatrixXd& SIG);
 	vector<int> lnodes(Tree * tptr);
 	Node * ch_node(Tree * tptr, const VectorXd& data, 
 					const vector<string> names);
-	void update(Tree * tptr, Node * uptr, /*const VectorXd& data,
-					const vector<string> names,*/ vector<int> nodes, 
+	void kupdate(Tree * tptr, Node * uptr, vector<int> nodes, 
 					const int DIM, const VectorXd& yi,
 					const MatrixXd& WMAT, const MatrixXd& VMAT,
+					const MatrixXd& FMAT, const MatrixXd& HMAT);
+	void lupdate(Tree * tptr, Node * uptr, vector<int> nodes, 
+					const VectorXd& yi,
 					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, double Vdet, double Wdet);
+					const MatrixXd& HVIH, const MatrixXd& VIH,
+					const MatrixXd& WIFT, const MatrixXd& WIF,
+					const MatrixXd& FWIF, double Vdet, double Wdet);
 	void proposal(Tree * tptr, Node * fptr,
 					const vector<int> leaf_nodes,
 					const vector<int> int_nodes,
 					const double ALPH, const double BET,
 					double in_rule, const int DIM,
 					const vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet);
+					const MatrixXd& data, int iter);
 	int ch_tree(Tree * pcur, Tree * pnew);
 	void treeout(Node * nptr, ofstream& outfile);
 };
@@ -70,7 +64,7 @@ class Forest {
 void Forest::init_tree(Tree * tptr, Ref<MatrixXd> ATMAT, 
 			Ref<MatrixXd> AIMAT, double ALPHA, double BETA, 
 			Ref<VectorXd> CVEC, Ref<VectorXd> DVEC, double& ppost,
-			double& lpost, 
+			double& lpost, int tname,
 			const vector<string> names, const MatrixXd& data, 
 			const VectorXd& MU, const MatrixXd& SIG) {
 	pair<string, double> randpair;
@@ -87,6 +81,7 @@ void Forest::init_tree(Tree * tptr, Ref<MatrixXd> ATMAT,
 	tptr->root->dvec = DVEC;
 	tptr->root->ppost = ppost;
 	tptr->root->lpost = lpost;
+	tptr->tname = tname;
 }
 
 vector<int> Forest::lnodes(Tree * tptr) {
@@ -102,20 +97,14 @@ Node * Forest::ch_node(Tree * tptr, const VectorXd& data,
 	return temp;
 }
 
-void Forest::update(Tree * tptr, Node * uptr, /*const VectorXd& data,
-					const vector<string> names,*/ vector<int> nodes, 
+void Forest::kupdate(Tree * tptr, Node * uptr, vector<int> nodes, 
 					const int DIM, const VectorXd& yi,
 					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, double Vdet, double Wdet) {
+					const MatrixXd& FMAT, const MatrixXd& HMAT) {
+
 	int const num_leaves = nodes.size();
-	//int const data_size = data.size();
 
 	Kalman k(DIM);
-	Lpost l;
 	if (num_leaves > 1) {
 		int rem_leaf = uptr->nnode;
 		nodes.erase(remove(nodes.begin(), nodes.end(), rem_leaf),
@@ -125,12 +114,6 @@ void Forest::update(Tree * tptr, Node * uptr, /*const VectorXd& data,
 			temp = tptr->find_node(tptr->root, nodes[j]);
 			k.nzhat(temp->state, FMAT);
 			k.nsighat(temp->svar, WMAT);
-	//		cout << "temp->ppost is: " << temp->ppost
-	//			<< "and temp->lpost is: " << temp->lpost << endl;
-			l.lpostnup(temp->atmat, temp->aimat, 
-				temp->cvec, temp->dvec, 
-				temp->ppost, temp->lpost, FWF, WI,
-				WF, WFT, Wdet);
 		}
 	}
 	// Predict
@@ -142,15 +125,37 @@ void Forest::update(Tree * tptr, Node * uptr, /*const VectorXd& data,
 	k.kalg(k.kal_g, k.r_mat, FMAT, k.s_mat);
 	k.zhat(uptr->state, k.z_vec, k.kal_g, k.y_vec);
 	k.sighat(uptr->svar, k.r_mat, HMAT, k.kal_g);
+}
 
+void Forest::lupdate(Tree * tptr, Node * uptr, vector<int> nodes, 
+					const VectorXd& yi,
+					const MatrixXd& WI, const MatrixXd& VI,
+					const MatrixXd& HVIH, const MatrixXd& VIH,
+					const MatrixXd& WIFT, const MatrixXd& WIF,
+					const MatrixXd& FWIF, double Vdet, double Wdet) {
+
+	int const num_leaves = nodes.size();
+
+	Lpost l;
+	if (num_leaves > 1) {
+		int rem_leaf = uptr->nnode;
+		nodes.erase(remove(nodes.begin(), nodes.end(), rem_leaf),
+						nodes.end());
+		Node * temp;
+		for (int j = 0; j < (num_leaves-1); j++) {
+			temp = tptr->find_node(tptr->root, nodes[j]);
+		cout << "Inside lupdate temp->nnode is:" << temp->nnode << endl;
+			l.lpostnup(temp->atmat, temp->aimat, 
+				temp->cvec, temp->dvec, 
+				temp->ppost, temp->lpost, FWIF, WI,
+				WIF, WIFT, Wdet);
+		cout << "Inside lupdate temp->lpost is:" << temp->lpost << endl;
+		}
+	}
 	l.lpostup(uptr->atmat, uptr->aimat, uptr->cvec, uptr->dvec,
-		uptr->ppost, uptr->lpost, yi, VI, FWF, WI, WF,
-		WFT, HVH, VH, Vdet, Wdet);
-
-	//cout << "uptr->ppost is: " << uptr->ppost
-	//	<< " and uptr->lpost is: " << uptr->lpost << endl;
-
-	tptr->find_post(tptr->root);
+		uptr->ppost, uptr->lpost, yi, VI, FWIF, WI, WIF,
+		WIFT, HVIH, VIH, Vdet, Wdet);
+	cout << "Inside lupdate uptr->lpost is:" << uptr->lpost << endl;
 }
 
 void Forest::proposal(Tree * tptr, Node * fptr,
@@ -159,14 +164,8 @@ void Forest::proposal(Tree * tptr, Node * fptr,
 					const double ALPH, const double BET,
 					double in_rule, const int DIM,
 					const vector<string> names,
-					const MatrixXd& data, int iter,
-					const MatrixXd& WMAT, const MatrixXd& VMAT,
-					const MatrixXd& WI, const MatrixXd& VI,
-					const MatrixXd& FMAT, const MatrixXd& HMAT,
-					const MatrixXd& HVH, const MatrixXd& VH,
-					const MatrixXd& WFT, const MatrixXd& WF,
-					const MatrixXd& FWF, const VectorXd& yi,
-					double Vdet, double Wdet) {
+					const MatrixXd& data, int iter) {
+
 	int num_leaves = leaf_nodes.size();
 
 	Prop p;
@@ -186,9 +185,7 @@ void Forest::proposal(Tree * tptr, Node * fptr,
 		case 1: {
 		//cout << "The move is grow.\n";
 		p.gprop(tptr, fptr, pmove, leaf_nodes, ALPH, BET, in_rule,
-					DIM, names, data, iter, WMAT, VMAT, WI, VI,
-					FMAT, HMAT, HVH, VH, WFT, WF, FWF, yi,
-					Vdet, Wdet);
+					DIM, names, data, iter);
 	/*	cout << "log Tree Posterior is: " << tptr->tree_post << endl;
 		cout << "log Tree Prior is: " << log(tptr->prior) << endl;
 		cout << "log Tree prop_new is: " << log(tptr->prop_new) <<endl;
@@ -213,9 +210,7 @@ void Forest::proposal(Tree * tptr, Node * fptr,
 		}
 		case 4: {
 		//cout << "The move is prune.\n";
-		p.pprop(tptr, fptr, pmove, int_nodes, ALPH, BET, DIM, names,
-					data, iter, WMAT, VMAT, WI, VI, FMAT, HMAT,
-					HVH, VH, WFT, WF, FWF, yi, Vdet, Wdet);
+		p.pprop(tptr, fptr, pmove, int_nodes, DIM);
 		break;
 		}
 	};
@@ -297,20 +292,20 @@ int main() {
 	MatrixXd WTI(DIMS, DIMS);
 	WTI = WT.inverse();
 
-	MatrixXd FWFT(DIMS, DIMS);
-	FWFT = FT.transpose()*WT.inverse()*FT;
-	MatrixXd HVHT(DIMS, DIMS);
-	HVHT = HT.transpose()*VT.inverse()*HT;
-	MatrixXd VHT(DIMS, DIMS);
-	VHT = VTI*HT;
-	MatrixXd WFT(DIMS, DIMS);
-	WFT = WTI*FT.transpose();
-	MatrixXd WF(DIMS, DIMS);
-	WF = WTI*FT;
+	MatrixXd FWIFT(DIMS, DIMS);
+	FWIFT = FT.transpose()*WT.inverse()*FT;
+	MatrixXd HVIHT(DIMS, DIMS);
+	HVIHT = HT.transpose()*VT.inverse()*HT;
+	MatrixXd VIHT(DIMS, DIMS);
+	VIHT = VTI*HT;
+	MatrixXd WIFT(DIMS, DIMS);
+	WIFT = WTI*FT.transpose();
+	MatrixXd WIF(DIMS, DIMS);
+	WIF = WTI*FT;
 
 	// Get intial values for posterior conditional
 	MatrixXd AT_0(DIMS, DIMS);
-	AT_0 = W0.inverse()+FWFT;
+	AT_0 = W0.inverse()+FWIFT;
 	MatrixXd AI_0(DIMS, DIMS);
 	AI_0.setZero();
 	VectorXd D_0(DIMS);
@@ -393,7 +388,7 @@ int main() {
 			// Get updated Tree
 			ftest.update(tree, found,
 				leaf_nodes_up, DIMS, yi, WT, VT, WTI, 
-				VTI, FT, HT, HVHT, VHT, WFT, WF, FWFT, 
+				VTI, FT, HT, HVIHT, VIHT, WIFT, WIF, FWIFT, 
 				VTD, WTD);
 
 			// Copy tree
@@ -432,8 +427,8 @@ int main() {
 			// Propose new tree
 			ftest.proposal(cptr, found, leaf_nodes_prop, int_nodes,
 					ALPH, BET, nprule, DIMS, myNames, datai, i, WT, VT,
-					WTI, VTI, FT, HT, HVHT, VHT, WFT, WF,
-					FWFT, yi, VTD, WTD);
+					WTI, VTI, FT, HT, HVIHT, VIHT, WIFT, WIF,
+					FWIFT, yi, VTD, WTD);
 			if (nleaves > 1) {
 			cout << "The copy after the proposal:\n";
 			cout << "Copy Posterior is: " << cptr->tree_post << endl;
@@ -462,7 +457,7 @@ int main() {
 		//	tree->display(tree->root);
 		//	cout << endl;	
 		//	m.prune(found, DIMS, datai, found->nnode, WT, VT, WTI, VTI,
-		//			FT, HT, HVHT, VHT, WFT, WF, FWFT, yi, VTD, WTD);
+		//			FT, HT, HVIHT, VIHT, WIFT, WIF, FWIFT, yi, VTD, WTD);
 		//	tree->display(tree->root);
 		//	cout << endl;	
 			//tree->find_post(tree->root);

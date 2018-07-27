@@ -136,6 +136,22 @@ void sim_x(const int P, string filename, int stop) {
 	}
 }
 
+void sim_normx(const int P, string filename, int stop, double var) {
+	Dist d;
+	ofstream outfile;
+	outfile.open(filename);
+	double rand_doub;
+	int n = 0;
+	while (n < stop) {
+		for (int i = 1; i < (P+1); i++) {
+			rand_doub = d.rnorm(i, var);
+			outfile << rand_doub << " ";
+		}
+	outfile << "\n";
+	n++;	
+	}
+}
+
 // A function to count the number of words in a string
 int wordcount(string s) {
 	int count = 0;
@@ -178,6 +194,22 @@ void get_exts(const string& path, const string& ext) {
 		}
 	}
 	cout << "The list is complete or the file does not exist." << endl;
+	closedir(dir);
+}
+
+// A function to search a directory and delete all the files within.
+void del_files(const string& path) {
+	DIR * dir = opendir(path.c_str());
+	char filepath[1000];
+	if (!dir) {
+		cout << "Directory not found." << endl;
+	}
+	dirent * entry;
+	while ((entry = readdir(dir)) != NULL) {
+		sprintf(filepath, "%s/%s", path.c_str(), entry->d_name);
+		remove(filepath); 
+	}
+	cout << "The folder is empty." << endl;
 	closedir(dir);
 }
 

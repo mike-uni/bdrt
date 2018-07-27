@@ -41,6 +41,10 @@ class Settings {
 	void get_wd(); 
 	void example();
 	void examplemat();
+	float get_float();
+	int get_int();
+	void add_mat(Setting& set);
+	void add_vec(Setting& set);
 	vector<int> get_vint(vector<int>& vec);
 	vector<float> get_vfloat(vector<float>& vec);
 	int get_dim();
@@ -135,29 +139,178 @@ int Settings :: get_dim() {
 	return dim;
 }
 
+float Settings :: get_float() {
+	string input;
+	float entry;
+	while (true) {
+		cout << "Please input a float value: ";
+		getline(cin, input);
+		stringstream matstream(input);
+		if (matstream >> entry) break;
+		cout << "Invalid entry, please try again." << endl;
+	}
+	return entry;
+}
+
+int Settings :: get_int() {
+	string input;
+	int entry;
+	while (true) {
+		cout << "Please input an int value: ";
+		getline(cin, input);
+		stringstream matstream(input);
+		if (matstream >> entry) break;
+		cout << "Invalid entry, please try again." << endl;
+	}
+	return entry;
+}
+
+void Settings :: add_mat(Setting& set) {
+	//int dim = get_dim();
+	float entry;
+	for (int i = 0; i < dim*dim; i++) {
+		entry = get_float();
+		set.add(Setting::TypeFloat) = entry;
+	}
+}
+
+void Settings :: add_vec(Setting& set) {
+	//int dim = get_dim();
+	float entry;
+	for (int i = 0; i < dim; i++) {
+		entry = get_float();
+		set.add(Setting::TypeFloat) = entry;
+	}
+}
+
 void Settings :: set_vint(vector<int>& vec, const int vsize) {
-	cout << "There are " << vsize << " to enter.\n";
-	vec.clear();
-	for (int i = 0; i < vsize; i++) {
-		cout << "Please enter an int: \n";
-		int input;
-		cin >> input;
-		if (cin.peek() == '\b') cin.clear();
-		vec.push_back(input);
+	vector<int> entries;
+	vector<int> copies;
+	
+ 	int unique;
+	int entry;
+	int copy;
+
+	cout << "There is/are " << vsize << " maximum entries for this variable. \n";
+	cout << "Please enter the unique values of the parameters. e.g. 100 200 300.\n"
+			"If there are multiple copies of the same value you will be asked\n"
+			"to enter these in the same order as previously. e.g. 5 2 1.\n"
+			"The sum of the number of copies should equal " << vsize << ".\n\n";
+
+	while (true) {
+		if (vsize > 1) { 
+			cout << "First, the enter number of unique values.\n";
+			unique = get_int();
+		}
+		else { unique = 1; }
+		cout << endl;
+
+		cout << "Now input the values when requested.\n";
+		for (int i = 0; i < unique; i++) {
+			entry = get_int();
+			entries.push_back(entry);
+		}
+		cout << endl;
+
+		if (vsize > 1 && unique != 1 || vsize > 1 && unique != vsize) {
+			cout << "Now the number of copies of each of the unique values:\n";
+			for (int i = 0; i < unique; i++) {
+				copy = get_int();
+				copies.push_back(copy);
+			}
+		}
+		else { copies.push_back((int)1); }
+		cout << endl;
+	
+		int sumcopies = accumulate(copies.begin(), copies.end(), 0);	
+		if (sumcopies == vsize) {break;}
+		else {
+		cout << "Number of copies is: " << copies.size() << endl << 
+				"Number of entries is: " << entries.size() << endl <<
+				"These should be equal." << endl;
+		cout << "There seems to be a mistake, please try again.\n";
+		copies.clear();
+		entries.clear();
+		}
+	}
+
+	for (int i = 0; i < copies.size(); i++) {
+		int numcopy = copies[i];
+		int nument = entries[i];
+		for (int j = 0; j < numcopy; j++) {
+			vec.push_back(nument);
+		}
+	}
+
+	for (int i = 0; i < vec.size(); i++) {
+		cout << "vec entries are " << vec[i] << endl;
 	}
 }
  
+
 void Settings :: set_vfloat(vector<float>& vec, const int vsize) {
-	cout << "There are " << vsize << " to enter.\n";
-	vec.clear();
-	for (int i = 0; i < vsize; i++) {
-		cout << "Please enter a float: \n";
-		float input;
-		cin >> input;
-		if (cin.peek() == '\b') cin.clear();
-		vec.push_back(input);
+	vector<float> entries;
+	vector<int> copies;
+	
+ 	int unique;
+	float entry;
+	int copy;
+
+	cout << "There is/are " << vsize << " maximum entries for this variable. \n";
+	cout << "Please enter the unique values of the parameters. e.g. 0.75 0.85 0.95.\n"
+			"If there are multiple copies of the same value you will be asked\n"
+			"to enter these in the same order as previously. e.g. 5 2 1.\n"
+			"The sum of the number of copies should equal " << vsize << "." << endl;
+
+	while (true) {
+		if (vsize > 1) { 
+			cout << "First, the enter number of unique values.\n";
+			unique = get_int();
+		}
+		else { unique = 1; }
+		cout << endl;
+
+		cout << "Now input the values when requested.\n";
+		for (int i = 0; i < unique; i++) {
+			entry = get_float();
+			entries.push_back(entry);
+		}
+		cout << endl;
+
+		if (vsize > 1 && unique != 1 || vsize > 1 && unique != vsize) {
+			cout << "Now the number of copies of each of the unique values:\n";
+			for (int i = 0; i < unique; i++) {
+				copy = get_int();
+				copies.push_back(copy);
+			}
+		}
+		else { copies.push_back((int)1); }
+		cout << endl;
+		
+		int sumcopies = accumulate(copies.begin(), copies.end(), 0);	
+		if (sumcopies == vsize) {break;}
+		else {
+		cout << "Number of copies is: " << copies.size() << endl << 
+				"Number of entries is: " << entries.size() << endl <<
+				"These should be equal." << endl;
+		cout << "There seems to be a mistake, please try again.\n";
+		copies.clear();
+		entries.clear();
+		}
 	}
-} 
+
+	for (int i = 0; i < copies.size(); i++) {
+		int numcopy = copies[i];
+		float nument = entries[i];
+		for (int j = 0; j < numcopy; j++) {
+			vec.push_back(nument);
+		}
+	}
+
+	for (int i = 0; i < vec.size(); i++) {
+		cout << "vec entries are " << vec[i] << endl;
+	}
+}
 
 void Settings :: make_file(Config& cfg) {
 		
@@ -229,68 +382,52 @@ void Settings:: bset_fill(Setting& basiclist) {
 		}
 	}
 }
-
+	
 void Settings:: mat_setup(Setting& matlist, int nmats) {
 	for (int i = 0; i < nmats; i++) {
 		Setting &nmatlist = matlist.add(Setting::TypeList);
+		cout << "The number of matrices to fill are: " << nmats << endl;
+		cout << "There are 7 entries for each matrix.\n";
+		
 		Setting &matarr = nmatlist.add(Setting::TypeArray);
-		double entry;
-		cin.ignore();
-		cout << "Firstly, W0:\n";
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr.add(Setting::TypeFloat) = entry;
-		}
+		cout << "W0:\n";
+		add_mat(matarr);
 		cout << endl;
+				
 		Setting &matarr1 = nmatlist.add(Setting::TypeArray);
 		cout << "WT:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr1.add(Setting::TypeFloat) = entry;
-		}
+		add_mat(matarr1);
 		cout << endl;
+				
 		Setting &matarr2 = nmatlist.add(Setting::TypeArray);
 		cout << "VT:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr2.add(Setting::TypeFloat) = entry;
-		}
+		add_mat(matarr2);
 		cout << endl;
+
 		Setting &matarr3 = nmatlist.add(Setting::TypeArray);
 		cout << "HT:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr3.add(Setting::TypeFloat) = entry;
-		}
+		add_mat(matarr3);
 		cout << endl;
+				
 		Setting &matarr4 = nmatlist.add(Setting::TypeArray);
 		cout << "FT:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr4.add(Setting::TypeFloat) = entry;
-		}
+		add_mat(matarr4);
 		cout << endl;
+
 		Setting &matarr5 = nmatlist.add(Setting::TypeArray);
 		cout << "SIG:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr5.add(Setting::TypeFloat) = entry;
-		}
+		add_mat(matarr5);
 		cout << endl;
+
 		Setting &matarr6 = nmatlist.add(Setting::TypeArray);
-		cout << "and finally MU:\n";
-		cin.ignore();
-		while (cin.peek() != '\n') {
-			cin >> entry;
-			matarr6.add(Setting::TypeFloat) = entry;
+		cout << "MU:\n";
+		add_vec(matarr6);
+		cout << endl;
+
+		if (i < (nmats-1)) {
+			cout << "Now for the next matrix ... " << endl << endl;
 		}
 	}
-	cout << endl;
 }
 
 void Settings :: set_file() {
@@ -303,33 +440,54 @@ void Settings :: set_file() {
 }
 
 void Settings :: bsetup(int nmats) {
-	cout << "Enter the number of Loop examples:\n";
-	cin >> nloops;
-	cout << "Enter the number of Forest examples:\n";
-	cin >> nforest;
-	if (nmats > 1) {
-		nrest = 1;
-	}
-	else {
-		cout << "Enter the number of examples for Data_Length, Nsplits, "
-			"Alpha and Beta (this is a single integer):\n";
-		cin >> nrest;
-	}
-	cout << "Finally, enter the dimension of the response variable:\n";
-	cin >> dim;
+	cout << "Here we need to modify all the settings. Press Enter to continue:";
+	cin.ignore();
 
-	cout << "Set Loops.\n";
+	cout << "Enter the dimension of the response variable:\n";
+	dim = get_int();
+	
+	cout << "Enter the total number of LOOP experiments:\n";
+	nloops = get_int();
+	cout << "Now set the number of iterations of the unique LOOP\n" 
+				"experiments and the number of copies of each.\n\n";
 	set_vint(loops, nloops);
-	cout << "Set Forest\n";
+	cout << endl;
+
+	cout << "Enter the total number of FOREST experiments:\n";
+	nforest = get_int();
+	cout << "Now set the ensemble size of the unique FOREST experiments\n" 
+				"and the number of copies of each.\n\n";
 	set_vint(forest, nforest);
-	cout << "Set Data_length\n";
+	cout << endl;
+
+	if (nmats > 1) { nrest = 1; }
+	else {
+		cout << "Enter the total number of examples for DATA_LENGTH, NSPLITS,\n"
+					"ALPHA and BETA (this is a single integer):\n\n";
+		nrest = get_int();
+	}
+	cout << "Now set the length of the unique predictor vectors, DATA_LENGTH,\n"
+			"and the number of copies of each.\n\n";
 	set_vint(dl, nrest);
-	cout << "Set Nsplits\n";
+	cout << endl;
+
+	cout << "The total number of experiments for NSPLITS is: " << 
+			nrest << ".\nYou can now enter the unique values to be used in\n"
+			"the experiments and the number of copies of each.\n\n";
 	set_vint(ns, nrest);
-	cout << "Set Alpha.\n";
+	cout << endl;
+
+	cout << "The total number of experiments for ALPHA is: " << 
+			nrest << ".\nYou can now enter the unique values to be used in\n"
+			"the experiments and the number of copies of each.\n\n";
 	set_vfloat(alpha, nrest);
-	cout << "Set Beta.\n";
+	cout << endl;
+
+	cout << "The total number of experiments for BETA is: " << 
+			nrest << ".\nYou can now enter the unique values to be used in\n"
+			"the experiments and the number of copies of each.\n\n";
 	set_vfloat(beta, nrest);
+	cout << endl;
 }
 
 void Settings :: getintArray(int marr[], const Setting& mat, 

@@ -6,6 +6,8 @@
 # include <algorithm>
 # include <vector>
 # include <time.h>
+# include <chrono>
+# include <dirent.h>
 # include "read_data.h"
 # include "kalman_class.h"
 # include "priorf.h"
@@ -18,7 +20,7 @@
 # include "settings_class.h"
 # include "stree_class.h"
 # include "snode_class.h"
-# include "sim_class.h"
+# include "simfixed_class.h"
 
 using namespace std;
 using namespace Eigen;
@@ -51,7 +53,8 @@ int main() {
 	// Get the current working directory and place in
 	// settings class
 	string cwd = get_wd();
-	set.outpath = cwd;
+	string pwd = cwd.substr(0, cwd.size()-3);
+	set.outpath = pwd;
 
 	// Declare path names
 	string outpath;
@@ -64,27 +67,14 @@ int main() {
 		"if you wish to modify an existing one, please type 'mod'\n"
 		"or if you wish to create a new one, please type 'new'\n";
 	string exname;
-	while (cin.peek() != '\n') {
-		cin >> exname;
-		if (cin.peek() == '\b') {
-			cin.clear();
-		}
-	}
-	cin.ignore();
+	getline(cin, exname);
 	if (exname == "new") {
 		// Choose type of experiment
 		cout << "As you have selected to create a new config file you will \n"
 			"need to choose the type of experiment you wish to conduct.\n"
 			"Please enter either either 1 or 2 corresponding to the options\n"
 			"described in the introduction and press enter.\n";
-		int opt;
-		while (cin.peek() != '\n') {
-			cin >> opt;
-			if (cin.peek() == '\b') {
-				cin.clear();
-			}
-		}
-		cin.ignore();
+		int opt = set.get_int();
 
 		// Get input folder name for this run of experiments
 		cout << "Please enter the name of the separate folders in which\n" 
@@ -92,50 +82,34 @@ int main() {
 "If they do not yet exist, they will be created.\n";
 		cout << "First the input folder:\n";
 		string infoldername;
-		while (cin.peek() != '\n') {
-			cin >> infoldername;
-			if (cin.peek() == '\b') {
-				cin.clear();
-			}
-		}
-		cin.ignore();
+		getline(cin, infoldername);
 		
 		set.infolder = infoldername;
 
 		// Make new folder path 
-		inpath = cwd+"/"+infoldername;
+		inpath = pwd+infoldername;
+		cout << inpath << endl;
 
 		// Make new folder
-		set.make_folder(set.infolder);
+		set.make_folder(inpath);
 
 		// Get folder name for output
 		cout << "Now the output folder.\n";
 		string foutname;
-		while (cin.peek() != '\n') {
-			cin >> foutname;
-			if (cin.peek() == '\b') {
-				cin.clear();
-			}
-		}	
-		cin.ignore();
+		getline(cin, foutname);
 		set.outfolder = foutname;
-	
-		// Make new folder
-		set.make_folder(set.outfolder);
 
 		// Make new folder path
-		outpath = cwd+"/"+foutname;
+		outpath = pwd+foutname;
+		cout << outpath << endl;
+	
+		// Make new folder
+		set.make_folder(outpath);
 
 		// Set the config file name
 		cout << "Please enter the name of the new .cfg file (without extension): "; 
 		string newname;
-		while (cin.peek() != '\n') {
-			cin >> newname;
-			if (cin.peek() == '\b') {
-				cin.clear();
-			}
-		}	
-		cin.ignore();
+		getline(cin, newname);
 		set.outname = newname+".cfg";
 		cout << endl;
 	
@@ -150,13 +124,12 @@ int main() {
 
 			// Make the cfg file
 			set.make_file(cfg);
-			cin.ignore();
+			//cin.ignore();
 		}
 		else if (opt == 2) {
 			// Set the number of matrix examples
 			cout << "Please enter the number of matrix examples: \n";
-			int nmats;
-			cin >> nmats;
+			int nmats = set.get_int();
 			set.nmat = nmats;
 
 			// Show the example output file
@@ -165,7 +138,6 @@ int main() {
 
 			// Make the cfg file
 			set.make_file(cfg);
-			cin.ignore();
 		}
 
 		// Simulate Data
@@ -177,13 +149,7 @@ int main() {
 		cout << "Please enter the name of the file you wish to modify\n"
 			"from those listed above:\n";
 		string modname;
-		while (cin.peek() != '\n') {
-			cin >> modname;
-			if (cin.peek() == '\b') {
-				cin.clear();
-			}
-		}	
-		cin.ignore();
+		getline(cin, modname);
 		modname = modname+".cfg";
 
 		try {
@@ -214,33 +180,31 @@ int main() {
 		catch(const SettingNotFoundException &nfex) {
 			cerr << "No 'setting_name' setting in config file." << endl;
 		}
+
+		Setting& fileinfo = modbase["file_path"];
+		fileinfo.remove("outpath");
+		fileinfo.add("outpath", Setting::TypeString) = set.outpath;
 		
 		cout <<"Please enter the setting you would like to modify:\n";
 		string modset;
 		bool right = true;
 		while (right) {
-			while (cin.peek() != '\n') {
-				cin >> modset;
-				if (cin.peek() == '\b') {
-					cin.clear();
-				}
-			}
-			Setting &upmod = modbase[modset];
+			getline(cin, modset);
 			if (modset == "basic_setup") {
 				try {
-					int blen = upmod.getLength();
-					for (int i = 0; i<blen; i++) {
-						upmod.remove(i);
-					}
-					set.bsetup(1);
-
+					modbase.remove("basic_setup");
+					modbase.add("basic_setup", Setting::TypeList);
+					
 					Setting& curinfo = modbase["setting_info"];
 					set.nmat = curinfo["nmat"];
 				
 					modbase.remove("setting_info");
-				
 					Setting& setinfo = modbase.add("setting_info", 
 										Setting::TypeGroup);
+				
+					Setting &upmod = modbase[modset];
+					set.bsetup(set.nmat);
+
 					setinfo.add("dim", Setting::TypeInt) = set.dim;
 					setinfo.add("nloops", Setting::TypeInt) = set.nloops;
 					setinfo.add("nforests", Setting::TypeInt) = set.nforest;
@@ -252,36 +216,33 @@ int main() {
 					right = false;
 				}
 				catch(const SettingNotFoundException &nfex) {
-				//	cerr << "Setting not found. Please try again."<< endl;
+					cerr << "Setting not found. Please try again."<< endl;
 				}
 			}
 			else if (modset == "matrix_setup") {
 				try{
-					int blen = upmod.getLength();
-					for (int i = 0; i<blen; i++) {
-						upmod.remove(i);
-					}
-					cout << "Please enter the number of matrix examples: \n";
-					int nmats;
-					cin >> nmats;
-					set.nmat = nmats;
+					modbase.remove("matrix_setup");
+					modbase.add("matrix_setup", Setting::TypeList);
 
+					cout << "Please enter the number of matrix examples: \n";
+					int nmats = set.get_int();
+					set.nmat = nmats;
+					
+					Setting& curinfo = modbase["setting_info"];
+					set.dim = curinfo["dim"];
+
+					Setting &upmod = modbase[modset];
 					set.mat_setup(upmod, set.nmat);
 
 					right = false;
 				}
 				catch(const SettingNotFoundException &nfex) {
-				//	cerr << "Setting not found. Please try again."<< endl;
+					cerr << "Setting not found. Please try again."<< endl;
 				}
 			}
 			else {
 				cout << "This setting is unavailable. Please choose another: ";		
-				while (cin.peek() != '\n') {
-					cin >> modset;
-					if (cin.peek() == '\b') {
-						cin.clear();
-					}
-				}
+				getline(cin, modset);
 			}
 		}
 		const char * nout = modname.c_str();
@@ -293,40 +254,101 @@ int main() {
 		catch (const FileIOException &fioex) {
 			cerr << "I/O error while writing file: " << modname << endl;
 		}
+
 		Setting &filemod = modbase["file_path"];
 
 		// Make new input folder path 
 		string infolder = filemod.lookup("infolder");
 		set.infolder = infolder;
-		inpath = cwd+"/"+set.infolder;
+		inpath = cwd+set.infolder;
 
 		// Make new output folder path 
 		string outfolder = filemod.lookup("outfolder");
 		set.outfolder = outfolder;
-		outpath = cwd+"/"+set.outfolder;
+		outpath = cwd+set.outfolder;
 
 		set.outname = modname;
 		// Re-simulate Data
 		cout << "You will now simulate data based on the configuration\n"
 			"you have modified. This will be used in the BDRT model below.\n";
-		cin.ignore();
+		//cin.ignore();
 		simtree.simcfg(cfg, set, d, exname, set.outname);
 	}
 	else {
 		set.outname = exname+".cfg";
+		cout << "Would you like to re-simulate the data? (yes/no)" << endl;
+		string resim;
+		getline(cin, resim);
+		if (resim == "yes") {
+			try {
+				cfg.readFile(set.outname.c_str());
+			}
+			catch(const FileIOException &fioex) {
+				cerr << "I/O error while reading file." << endl;
+				return (EXIT_FAILURE);
+			}
+			catch(const ParseException &pex) {
+				cerr << "Parse error at " << pex.getFile() << ":"
+					<< pex.getLine() << " - " << pex.getError() << endl;
+			return(EXIT_FAILURE);
+			}
+			// Get the base of the configuration file
+			const Setting& base = cfg.getRoot();
+
+			// Get paths
+			Setting& fileinfo = base["file_path"];
+			fileinfo.remove("infilesx");
+			fileinfo.remove("infilesy");
+			fileinfo.remove("infilesz");
+			fileinfo.remove("infilest");
+			fileinfo.add("infilesx", Setting::TypeList);
+			fileinfo.add("infilesy", Setting::TypeList);
+			fileinfo.add("infilesz", Setting::TypeList);
+			fileinfo.add("infilest", Setting::TypeList);
+			fileinfo.remove("outpath");
+			fileinfo.add("outpath", Setting::TypeString) = pwd;
+
+			// Write out the new configuration.
+			const char * reout = set.outname.c_str();
+			try {
+				cfg.writeFile(reout);
+				//cerr << "New config file written to: " << modname << endl;
+			}
+			catch (const FileIOException &fioex) {
+				cerr << "I/O error while writing file: " << set.outname << endl;
+			}
+			// Delete files in folders
+			// Get paths
+			string outfolder = fileinfo.lookup("outfolder");
+			string infolder = fileinfo.lookup("infolder");
+			inpath = pwd+infolder;
+			outpath = pwd+outfolder;
+
+			DIR * dir = opendir(outpath.c_str());
+			if (dir) { closedir(dir); }
+			else if (ENOENT == errno) {
+				set.make_folder(outpath);
+				set.make_folder(inpath);
+			}
+
+			del_files(inpath);
+			del_files(outpath);
+
+			// Resimulate data
+			simtree.simcfg(cfg, set, d, exname, set.outname);
+		}
 		//cin.ignore();
 	}
-	cin.ignore();
 	cout << "The current config file is "<< set.outname <<"." << endl;
 	cout << "The config is now complete. To continue onto the BDRT please type 'yes', else 'exit' will exit the program:\n";
 
 	string cont;
 	while (cin.peek() != '\n') {
-		cin >> cont;
+		getline(cin, cont);
 		if (cont == "yes") break;
 		else return(EXIT_SUCCESS);
 	}
-	cin.ignore();		
+	//cin.ignore();		
 	// Read the config file. If there is an error, 
 	// report it and exit;
 	try {
@@ -358,8 +380,8 @@ int main() {
 	const Setting& fileinfo = base["file_path"];
 	string outfolder = fileinfo.lookup("outfolder");
 	string infolder = fileinfo.lookup("infolder");
-	inpath = cwd+"/"+infolder;
-	outpath = cwd+"/"+outfolder;
+	inpath = pwd+infolder;
+	outpath = pwd+outfolder;
 
 	// Numbers of iterations of different settings
 	const Setting& setinfo = base["setting_info"];
@@ -398,7 +420,7 @@ int main() {
 	int step = nLOOPS*nFORESTS;
 	for (int rn = 0; rn < NUMEXP; rn++) {
 
-		// Get iterations of data variable xor number of matrices
+		// Get iterations of data variable or number of matrices
 		if (rn == step) {
 			nd++;
 			step = step+(nLOOPS*nFORESTS);
@@ -444,37 +466,41 @@ int main() {
 			VTI = VT.inverse();
 			MatrixXd WTI(DIMS, DIMS);
 			WTI = WT.inverse();
+			MatrixXd W0I(DIMS, DIMS);
+			W0I = W0.inverse();
 
-			MatrixXd FWFT(DIMS, DIMS);
-			FWFT = FT.transpose()*WT.inverse()*FT;
-			MatrixXd HVHT(DIMS, DIMS);
-			HVHT = HT.transpose()*VT.inverse()*HT;
-			MatrixXd VHT(DIMS, DIMS);
-			VHT = VTI*HT;
-			MatrixXd WFT(DIMS, DIMS);
-			WFT = WTI*FT.transpose();
-			MatrixXd WF(DIMS, DIMS);
-			WF = WTI*FT;
+			MatrixXd FWIFT(DIMS, DIMS);
+			FWIFT = FT.transpose()*WTI*FT;
+			MatrixXd HVIHT(DIMS, DIMS);
+			HVIHT = HT.transpose()*VTI*HT;
+			MatrixXd VIHT(DIMS, DIMS);
+			VIHT = VTI*HT;
+			MatrixXd WIFT(DIMS, DIMS);
+			WIFT = (WTI*FT).transpose();
+			MatrixXd WIF(DIMS, DIMS);
+			WIF = WTI*FT;
 
 			// Get intial values for posterior conditional
 			MatrixXd AT_0(DIMS, DIMS);
-			AT_0 = W0.inverse()+FWFT;
+			AT_0 = W0.inverse()+FWIFT;
 			MatrixXd AI_0(DIMS, DIMS);
-			AI_0.setZero();
+			AI_0.setZero(DIMS, DIMS);
 			VectorXd D_0(DIMS);
 			D_0 = MU.transpose()*W0;
 
 			double VTD = VT.determinant();
 			double WTD = WT.determinant();
-			double LG_W0D = -log(2*M_PI*W0.determinant());
-			double W0_SQ = MU.transpose()*W0.inverse()*MU;
-			double LG_AD = log(2*M_PI*AT_0.determinant());
-			double ADSQ_0 = D_0.transpose()*AT_0*D_0;
-			double POST_INIT = 0.5*(LG_AD+LG_W0D)+0.5*(ADSQ_0+W0_SQ);
+			double LG_W0D = log(W0.determinant());
+			double LG_AD = log(AT_0.determinant());
+			double W0_SQ = (MU.transpose()*W0I*MU);
+			double ADSQ_0 = (D_0.transpose()*AT_0.inverse()*D_0);
+			double POST_INIT = -0.5*(LG_W0D - LG_AD + W0_SQ - (0.25)*ADSQ_0);
 			double LPOST_INIT = 0.0;
 
-			//cout << "LPOST_INIT: " << LPOST_INIT << " POST_INIT: " << POST_INIT
-			//	<< endl;
+			cout << "LG_W0D: " << LG_W0D << " W0_SQ: " << W0_SQ 
+				 << " LG_AD: " << LG_AD << " ADSQ_0: " << ADSQ_0 
+				 << " LPOST_INIT: " << LPOST_INIT << " POST_INIT: " << POST_INIT
+				<< endl;
 
 			// Initialise Base Experiment varaibles
 			LOOPS = basic_setup[rn][1];
@@ -512,7 +538,7 @@ int main() {
 			// Get output name suffix
 			string suffix = "_"+to_string(LOOPS)+"_"+to_string(FOREST)+
 							"_"+to_string(DATA_LENGTH)+"_"+to_string(NSPLITS)+
-							"_"+to_string(ALPH)+"_"+to_string(BET)+
+							"_"+to_string(ALPH)+"_"+to_string(BET)+"_"+to_string(rn)+
 							"_"+to_string(rm);
 			suffix.erase(remove(suffix.begin(), suffix.end(), '.'), suffix.end());
 			suffix = suffix+".txt";
@@ -544,6 +570,10 @@ int main() {
 			ofstream file4;
 			file4.open(path4);
 
+			string path5 = outpath+"/"+"time"+suffix;
+			ofstream file5;
+			file5.open(path5);
+
 			// Get a line of data from .txt file and make predictor names
 			MatrixXd datai(NSPLITS, DATA_LENGTH);
 			datai.row(0) = read_line(0, DATA_LENGTH, ifs);
@@ -554,9 +584,9 @@ int main() {
 			//Forest forest(FOREST);
 			Forest forest;
 			Tree * tree = forest.fptr;	
-			vector<int> leaf_nodes_up;
-			vector<int> leaf_nodes_prop;
+			vector<int> leaf_nodes;
 			vector<int> int_nodes;
+			vector<int> leaf_nodes_prop;
 			VectorXd datavec(DATA_LENGTH);
 
 			VectorXd qvec(FOREST);
@@ -572,24 +602,39 @@ int main() {
 				//itree.display(itree.root);
 				forest.fvec.push_back(itree);
 				//cout << &forest.fvec[k] << endl;
+			}
+
+			for (int k = 0; k < FOREST; k++) {
 				tree = &forest.fvec[k];
 				//cout << "Address of Tree is " << tree << endl;
 				forest.init_tree(tree, AT_0, AI_0, ALPH, BET, D_0, D_0, 
-					POST_INIT, LPOST_INIT, myNames, datai, MU, SIG);
-			//	cout << "For Tree " << k << " lpost is: " << 
-			//	tree->root->lpost <<" and ppost is:" << tree->root->ppost
-			//	<< " and tree->tree_post is: " << tree->tree_post 
-			//	<< endl;
-			//	cout << "For Tree " << k << " aimat is: " << 
-			//	tree->root->aimat <<" and atmat is:" << tree->root->atmat
-			//	<< " and tree->tree_post is: " << tree->tree_post 
-			//	<< endl;
+					POST_INIT, LPOST_INIT, k, myNames, datai, MU, SIG);
+				cout << "For Tree " << tree->tname << " lpost is: " << 
+				tree->root->lpost <<" and ppost is:" << tree->root->ppost
+				<< " and tree->tree_post is: " << tree->tree_post 
+				<< endl;
+				cout << "For Tree " << k << " aimat is: " << 
+				tree->root->aimat <<" and atmat is:" << tree->root->atmat
+				<< " and tree->tree_post is: " << tree->tree_post 
+				<< endl;
 			}
-			//cout << "Initialisation over.\n"; 
+			//cout << "Initialisation over.\n";
+			cout << "The names of initalised trees" << endl;	 
+			for (int k = 0; k < FOREST; k++) {
+				cout << forest.fvec[k].tname << " ";
+				cout << forest.fvec[k].root->ppost << " ";
+				cout << forest.fvec[k].tree_post << " ";
+			}
+			cout << endl;
+
+			Tree * ltree = forest.fptr;	
 
 			// Begin loop over trees
 			for (int l = 1; l < LOOPS; l++) {
-			//	cout << "ITERATION NUMBER IS: " << l << endl << endl;
+				chrono::high_resolution_clock::time_point init1, init2, end2, end1;
+				init1 = chrono::high_resolution_clock::now();
+				file5 << l << " ";
+				cout << "ITERATION NUMBER IS: " << l << endl << endl;
 				int i = l%NSPLITS;
 				double num_splits = nsplit(1, NSPLITS);
 				double nprule = prule(DATA_LENGTH, num_splits);
@@ -606,53 +651,107 @@ int main() {
 				//cout << yi.transpose() << endl;
 
 				Node * found;
+				Node * cfound;
 				for (int k = 0; k < FOREST; k++) {
 					file1 << l << " " << k << " ";
 					file2 << l << " " << k << " ";
+					file5 << k << " ";
+					init2 = chrono::high_resolution_clock::now();
 				//	cout << "TREE NUMBER IS: " << k << endl << endl;
 
-					tree = &forest.fvec[k];
-					leaf_nodes_up = forest.lnodes(tree);
-					leaf_nodes_prop = leaf_nodes_up;
-					int nleaves = leaf_nodes_up.size();
-					tree->find_int_nodes(tree->root, int_nodes);
+					ltree = &forest.fvec[k];
+					cout << "TREE NUMBER IS: " << ltree->tname << endl;
+					cout << "The initial tree display is:\n";
+					ltree->display(ltree->root);
+					cout << endl;
+					cout << "&forest.fvec[k] " << &forest.fvec[k] << endl;
 
-					found = forest.ch_node(tree, datavec, myNames);
-				//	cout << "Found ppost is: " << found->ppost << endl;
-				//	cout << "Found lpost is: " << found->lpost << endl;
+					leaf_nodes = forest.lnodes(ltree);
+					int nleaves = leaf_nodes.size();
+					ltree->find_int_nodes(ltree->root, int_nodes);
+					cout << "The int_nodes are:\n";
+					for (i = 0; i < int_nodes.size(); i++) {
+						cout << int_nodes[i] << " ";
+					}
+					cout << endl;
 
-					forest.update(tree, found,
-					leaf_nodes_up, DIMS, yi, WT, VT, WTI, 
-					VTI, FT, HT, HVHT, VHT, WFT, WF, FWFT, 
-					VTD, WTD);
+					//STAGE 1. CHOOSE A LEAF USING CURRENT STATE SPACE
+					// AND CURRENT DATA.
+					found = forest.ch_node(ltree, datavec, myNames);
+					cout << "Found nnode is: " << found->nnode << endl;
+					cout << "Found ppost is: " << found->ppost << endl;
+					cout << "Found lpost is: " << found->lpost << endl;
+
+					forest.kupdate(ltree, found, leaf_nodes, DIMS, yi, 
+									WT, VT, FT, HT);
 
 					file1 << yi.transpose() << " ";
 					file1 << found->state.transpose() << " ";
 
-					// Copy tree
+					// COPY THE CURRENT TREE
 					Tree copy(1, DIMS);
-					//cout << "init tree copy:\n";
+					//cout << "init ltree copy:\n";
 					//copy.display(copy.root);
-					copy = *tree;
-					//cout << "tree copy of tree:\n";
+					copy = *ltree;
+					//cout << "ltree copy of ltree:\n";
 					//copy.display(copy.root);
 					Tree * cptr = &copy; 
-				
-					// Update tree prior
-					tree->find_prior(tree->root);
 
-					// Propose new tree
-					forest.proposal(cptr, found, leaf_nodes_prop, int_nodes,
-						ALPH, BET, nprule, DIMS, myNames, datai, i, WT, VT,
-						WTI, VTI, FT, HT, HVHT, VHT, WFT, WF,
-						FWFT, yi, VTD, WTD);
+					// STAGE 2. CHOOSE A RANDOM LEAF FROM THE CURRENT TREE
+					// AND PROPOSE A MOVE.
+					forest.proposal(cptr, found, leaf_nodes, int_nodes,
+						ALPH, BET, nprule, DIMS, myNames, datai, i);
 					file2 << cptr->move << " ";
-					cout << cptr->move << " ";
+					cout << "The ltree move is: " << cptr->move << "\n";
+					cout << "The int_nodes are:\n";
+					for (i = 0; i < int_nodes.size(); i++) {
+						cout << int_nodes[i] << " ";
+					}
+					cout << endl;
+
+					// STAGE 3. RESELECT LEAF USING CURRENT DATA AND PROPOSED TREE
+					// AND UPDATE POSTERIOR DATA
+					cfound = forest.ch_node(cptr, datavec, myNames);
+
+					// 3a. Update current tree (ltree).
+					cout << "Update current tree:\n";
+					forest.lupdate(ltree, found, leaf_nodes, yi, WTI, VTI, HVIHT,
+									VIHT, WIFT, WIF, FWIFT, VTD, WTD);
+
+					// Update ltree prior
+					cout << "Update current tree Prior:\n";
+					ltree->find_prior(ltree->root);
+					cout << ltree->prior << endl << endl;
+
+					// Update ltree tree_post
+					cout << "Update current tree Posterior:\n";
+					ltree->find_post(ltree->root);
+					cout << ltree->tree_post << endl << endl;
+
+					// 3b. Update proposed tree (ltree).
+					cout << "Update copy tree:\n";
+					leaf_nodes_prop = forest.lnodes(cptr);
+					forest.lupdate(cptr, cfound, leaf_nodes_prop, yi, WTI, VTI, HVIHT,
+									VIHT, WIFT, WIF, FWIFT, VTD, WTD);
+
+					// Update copy prior
+					cout << "Update copy tree Prior:\n";
+					cptr->find_prior(cptr->root);
+					cout << cptr->prior << endl << endl;
+
+					// Update copy tree_post
+					cout << "Update copy tree Poserior:\n";
+					cptr->find_post(cptr->root);
+					cout << cptr->tree_post << endl << endl;
+
+					// STAGE 4. CHOOSE TREE AND CALCULATE POSTERIORS
+					cout << "Choose Tree:\n";
 					int newtree;
-					newtree = forest.ch_tree(tree, cptr);
+					newtree = forest.ch_tree(ltree, cptr);
+					cout << newtree << endl << endl;
 					if (newtree == 2) {
 						file2 << 1 << "\n";
-						*tree = copy;
+						*ltree = copy;
 					//	copy.~Tree();
 					} 
 					else { 
@@ -660,34 +759,48 @@ int main() {
 					//	copy.~Tree();
 					}
 					file4 << l << " " << k+1 << "   ";
-					forest.treeout(tree->root, file4);
+					forest.treeout(ltree->root, file4);
 					file4 << endl;
-					//tree->display(tree->root);
+					cout << "Display Tree " << ltree->tname << " :\n";
+					ltree->display(ltree->root);
+					cout << endl;
 
 					double qstar;
-					qstar = log(tree->prior) + tree->tree_post;
+					qstar = log(ltree->prior) + ltree->tree_post;
+					cout << "log(ltree->prior) is: " << log(ltree->prior) << " and " <<
+						    "ltree->ltree_post is: " << ltree->tree_post << endl;
 					qvec(k) = qstar;
 					if (isnan(qstar) || isinf(qstar)) {
-						qstar = 99;
+						cout << "Tree_post is nan or inf." << endl << endl;
+						break;
 					}
 					file1 << qstar << "\n";
-					//cout << qstar << "\n";
-					tree->prior = 1.0;
-					tree->tree_post = 0.0;
+					cout << "qstar is: " << qstar << "\n\n";
+					ltree->prior = 1.0;
+					ltree->tree_post = 0.0; // Updated in each iteration
 					int_nodes.clear();
+					end2 = chrono::high_resolution_clock::now();
+					file5 << chrono::duration_cast<chrono::microseconds>(end2 - init2).count() << " ";
 				}
 				//cout << endl;
 				max_post = qvec.maxCoeff();
 				qvec = qvec.array() - max_post;
 				qvec = qvec.array().exp();
+				cout << "qvec is: " << qvec.transpose() << endl;
 				const_prop = qvec.sum();
-				//cout << const_prop << endl;
+				cout << "const_prop is: " << const_prop << endl;
+				if (isnan(const_prop) || isinf(const_prop)) {
+					cout << "Tree_post is nan or inf." << endl << endl;
+					break;
+				}
 				postvec = qvec.array()/const_prop;
 				//file3 << tree_index.transpose() << "\n"; 
 				file3 << postvec.transpose() << "\n";
-				//cout << "The tree posteriors at " << l << " are is:\n" <<
-				//		postvec.transpose() << endl;
-			//	cout << " " << l << " " << flush;
+				cout << "The ltree posteriors at " << l << " are:\n" <<
+						postvec.transpose() << endl << endl;
+				//cout << " " << l << " " << flush;
+				end1 = chrono::high_resolution_clock::now();
+				file5 << chrono::duration_cast<chrono::microseconds>(end1 - init1).count() << "\n";
 			}
 			cout << endl;
 		}
