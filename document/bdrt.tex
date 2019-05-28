@@ -1,0 +1,94 @@
+\documentclass[11pt, draft]{book}
+
+% Preamble - use this for settings that apply to the whole document.
+\usepackage{geometry}
+	\geometry{a4paper, margin=2cm, bottom=2cm}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\usepackage{amsmath, amssymb, amsthm, bm, standalone, enumerate, parskip, graphicx, float, mathtools, array, eurosym, tabularx, url, setspace}
+
+%\usepackage{fleqn}
+%\usepackage{algorithms}
+\usepackage[labelfont=bf]{caption}
+\usepackage[backend = biber]{biblatex}
+\addbibresource{bdrt.bib}
+
+% Some time saving macros
+\newcommand{\xit}[1]{x_{#1:t}}
+\newcommand{\yit}[1]{y_{#1:t}}
+\newcommand{\zit}[1]{z_{#1:t}}
+
+\newcommand{\xik}[1]{x_{#1, k}}
+\newcommand{\yik}[1]{y_{#1, k}}
+\newcommand{\zik}[1]{z_{#1, k}}
+\newcommand{\vik}[1]{\textit{v}_{#1, k}}
+\newcommand{\wik}[1]{\textit{w}_{#1, k}}
+\newcommand{\mik}[1]{\mu_{#1, k}}
+\newcommand{\Sik}[1]{\Sigma_{#1, k}}
+\newcommand{\Vk}[1]{V_#1}
+\newcommand{\Wk}[1]{W_#1}
+\newcommand{\kt}{K_T}
+\newcommand{\la}{\lambda_a}
+\newcommand{\ls}{\lambda_s}
+\newcommand{\lt}{\lambda_{\eta}}
+\newcommand{\lei}[1]{\lambda_{\eta_{#1}}}
+\newcommand{\tet}{\eta_{x, T}}
+\newcommand{\Ik}[1]{\operatorname{I_{#1, k}}}
+
+\newcommand{\ivk}[1]{V_{#1}^{-1}}
+\newcommand{\iwk}[1]{W_{#1}^{-1}}
+
+\DeclareMathOperator{\giv}{\, | \,}
+
+\DeclareMathOperator{\lint}{\displaystyle\int}
+\DeclareMathOperator{\lprod}{\displaystyle\prod}
+
+% Graphics path
+\graphicspath{{images/}}
+
+\onehalfspacing
+
+%Per Chpater include
+\includeonly{basecase}
+
+% Title
+\title{\LARGE{Bayesian Dynamic Regression Trees} \\
+PhD Thesis for Computer Science and Statistics \\
+Trinity College, Dublin}
+\date{}
+\author{Candidate: Michael Ferreira \\
+Supervisor: Professor Simon Wilson}
+
+% Begin Document
+\begin{document}
+\frontmatter
+%\maketitle
+%\tableofcontents
+
+\include{abstract}
+\include{Preface}
+
+\mainmatter
+\include{intro}
+\include{theory}
+\include{method}
+\include{basecase}
+\include{model}
+\include{experiments}
+\include{results}
+\include{critical}
+\include{furtherwork}
+\include{conclusions}
+
+\appendix
+\include{appendixa}
+\include{appendixb}
+
+
+%\backmatter
+%\chapter*{Bibliography}
+%\label{bib}
+%\printbibliography
+
+\end{document}

@@ -1,0 +1,239 @@
+\documentclass{standalone}
+
+% Preamble - use this for settings that apply to the whole document.
+\usepackage{geometry}
+	\geometry{a4paper, margin=1cm, bottom=1.5cm}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{parskip}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{array}
+\usepackage{eurosym}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage{algorithm}
+
+\usepackage[backend = biber]{biblatex}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\newcommand{\xit}[1]{{x_{#1:t}}}
+\newcommand{\yit}[1]{{y_{#1:t}}}
+\newcommand{\zit}[1]{{z_{#1:t}}}
+
+\newcommand{\xik}[1]{x_{#1, k}}
+\newcommand{\yik}[1]{y_{#1, k}}
+\newcommand{\zik}[1]{z_{#1, k}}
+\newcommand{\mik}[1]{\mu_{#1, k}}
+\newcommand{\vk}{V_k}
+\newcommand{\wk}{W_k}
+\newcommand{\Ik}[1]{\operatorname{I_{#1, k}}}
+
+\newcommand{\ivk}[1]{V_{#1}^{-1}}
+\newcommand{\iwk}[1]{W_{#1}^{-1}}
+
+\DeclareMathOperator{\giv}{\, | \,}
+
+\DeclareMathOperator{\lint}{\displaystyle\int}
+\DeclareMathOperator{\lprod}{\displaystyle\prod}
+
+
+% Begin Document
+\begin{document}
+The aim is to find an expression for:
+\begin{align*}
+ p(\,T \giv \xit{1}, \yit{1}) & \propto p(T)p(\yit{1} \giv \xit{1}, T) \\
+& = p(T) \lint p(\yit{1} \giv \xit{1}, T, \zit{0})p(\zit{0} \giv T)\; d\zit{0}  \\
+\intertext{if we apply the independence assumptions made in the document we get:} 
+& = p(T) \lint \left[\lprod_{i = 1}^t p(y_i \giv x_i, z_i, T)\; p(z_i \giv z_{t-1} \right] p(z_0)\; d\zit{0} \\
+& = p(T) \lint  \left[\lprod_{i = 1}^t p(y_i \giv x_i, z_i, T)\; \lprod^{K_T}_{k = 1} p(\zik{i} \giv \zik{i-1} \right] \lprod ^K_{k=1} p(\zik{0})\; d\zit{0}
+\end{align*}
+
+Using:
+\[
+\Ik{i} = \begin{cases}
+1, & \text{if}\; \eta(x_i, T) = k \\
+0, & \text{otherwise}
+\end{cases}
+\] 
+we get:
+\begin{align*}
+p(y_i \giv x_i, z_i, T) & = p(y_i \giv z_{i, \eta(x_i, T)}, V_{\eta(x_i, T)}) \\
+& = \lprod^K_{k=1} p(y_i \giv \zik{i}, \vk)^{\Ik{i}}
+\end{align*}
+and hence we have:
+\begin{align*}
+p(T \giv \xit{1}, \yit{1}) & \propto p(T) \lint \lprod^K_{k = 1} p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, T)d\zik{0} \dots d\zik{t}
+\intertext{We can completely factorise everything inside the integral by k so:}
+ & = p(T) \lprod^K_{k = 1} \lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, T)d\zik{0} \dots d\zik{t}
+\end{align*}
+Each integral is the same (up to index k) so the focus is on evaluating:
+\begin{align}
+\label{eq:kint}
+\lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, T)d\zik{0} \dots d\zik{t} 
+\end{align}
+
+We have for the initial distribution:
+\begin{align*}
+p(\zik{0}) & \sim N(\mik{0}, W_0) \\
+& = \frac{1}{|2 \pi W_0|} \exp \left[- \frac{1}{2}(\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0})\right] \\
+\intertext{and for each subsequent iteration we have}
+& = \frac{1}{|2 \pi \wk|}\exp \left[- \frac{1}{2}(\zik{i} - \zik{i-1})^T \iwk{k} (\zik{i} - \zik{i})\right]. \\
+\intertext{For each observation we have assumed:}
+p(\yik{0} \giv \zik{i}, \vk) & \sim N(\zik{i}, \vk) \\
+& = \frac{1}{|2 \pi \vk|}\exp \left[- \frac{1}{2}(\yik{i} - \zik{i})^T \ivk{0} (\yik{i} - \zik{i})\right]
+\intertext{and over the interations we have from \ref{eq:kint} }
+\lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}} & = \frac{1}{|2 \pi \vk|^{\Ik{i}} } \exp \left[- \frac{1}{2} \sum^{t}_{i = 1} \Ik{i} (\yik{i} - \zik{i})^T \ivk{0} (\yik{i} - \zik{i})\right]. \\
+\end{align*}
+If we drop constant terms (keeping those dependent on the choice of leaf) and return to \ref{eq:kint} then we have:
+\begin{multline}
+\lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, T)d\zik{0} \dots d\zik{t} \propto \\ \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \lint \exp \left[- \frac{1}{2}(\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0}) \right] \exp \left[ - \frac{1}{2} \sum^{t}_{i = 1} \Ik{i} (\yik{i} - \zik{i})^T \ivk{k} (\yik{i} - \zik{i})\right] \\ \exp \left[ - \frac{1}{2}(\zik{i} - \zik{i-1})^T \iwk{k} (\zik{i} - \zik{i})\right] d\zik{0} \dots d\zik{t}.
+\end{multline}
+Expanding this and rearranging we get:
+\begin{align*}
+ \left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \lint \exp \biggl[ & -\frac{1}{2} \biggl( (\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0})\; +  \\
+ & \Ik{1} \left(\yik{1} - \zik{1})^T \ivk{k} (\yik{1} - \zik{1}) \right) + (\zik{1} - \zik{0})^T \iwk{k} (\zik{1} - \zik{0})\; + \\ 
+ & \Ik{2} \left( (\yik{2} - \zik{2})^T \ivk{k} (\yik{2} - \zik{2}) \right) + (\zik{2} - \zik{1})^T \iwk{k} (\zik{2} - \zik{1})\; + \\
+ & \dots \; \; + \\
+ & \Ik{t-1} \left( (\yik{t-1} - \zik{t-1})^T \ivk{k} (\yik{t-1} - \zik{t-1}) \right) + (\zik{t-1} - \zik{t-2})^T \iwk{k} (\zik{t-1} - \zik{t-2})\; + \\
+ & \Ik{t} \left( (\yik{t} - \zik{t})^T \ivk{k} (\yik{t} - \zik{t}) \right) + (\zik{t} - \zik{t-1})^T \iwk{k} (\zik{t} - \zik{t-1}) \biggr) \biggr]d\zik{0} \dots d\zik{t}
+\end{align*}
+If we expand each of the quadratic forms and bearing mind that because $\vk$ is symmetric, positive semi-definite, $\ivk{k}$ is and hence:
+\begin{equation}
+\label{eq:lin1} 
+\zik{i}^T \ivk{k} \zik{i} =  \zik{i} \ivk{k} \zik{i}^T 
+\end{equation} 
+and similarly for the other forms, if we do a bit of rearranging we then have:
+\begin{align*}
+ \left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) & \lint \exp \biggl[-\frac{1}{2} \biggl(
+ \zik{0}^T \iwk{0} \zik{0} - 2 \mik{0}^T \iwk{0} \zik{0} + \mik{0} \iwk{0} \mik{0} \; +  \\
+ & \Ik{1} \left(\yik{1}^T \ivk{k} \yik{1} -2 \zik{1}^T \ivk{k} \yik{1} + \zik{1}^T \ivk{k} \zik{1} \right) + \zik{1}^T \iwk{k} \zik{1} - 2 \zik{1}^T \iwk{k}
+  \zik{0} + \zik{0} \iwk{k} \zik{0}\; + \\
+ & \Ik{2} \left(\yik{2}^T \ivk{k} \yik{2} -2 \zik{2}^T \ivk{k} \yik{2} + \zik{2}^T \ivk{k} \zik{2} \right) + \zik{2}^T \iwk{k} \zik{2} - 2 \zik{1}^T \iwk{k}
+  \zik{1} + \zik{1} \iwk{k} \zik{1}\; + \\
+ & \dots \; \; + \\
+ & \Ik{t} \left(\yik{t}^T \ivk{k} \yik{t} -2 \zik{t}^T \ivk{k} \yik{t} + \zik{t}^T \ivk{k} \zik{t} \right) + \zik{t}^T \iwk{k} \zik{t} - 2 \zik{t}^T \iwk{k}
+  \zik{t-1} + \zik{t-1} \iwk{k} \zik{t-1}\; \biggr) \biggr] \\
+ & d\zik{0} \dots d\zik{t} 
+\end{align*}
+Taking out terms that are not marginalised over $\zik{i}$ and rearranging again we get:
+\begin{align*}
+ \left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) & \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \cdot \\ 
+ \lint \exp \biggl[ -\frac{1}{2} \biggl(
+ & \zik{0}^T \iwk{0} \zik{0} + \zik{0}^T \iwk{k} \zik{0} -2 \mik{0}^T \iwk{0} \zik{0} -2 \zik{1}^T \iwk{k} \zik{0}\; +  \\
+ & \Ik{1} \zik{1}^T \ivk{k} \zik{1} + 2 \zik{1}^T \iwk{k} \zik{1} -2 \Ik{1} \zik{1}^T \ivk{k} \yik{1} -2 \zik{2}^T \iwk{k} \zik{1}\; +  \\ 
+ & \Ik{2} \zik{2}^T \ivk{k} \zik{2} + 2 \zik{2}^T \iwk{k} \zik{2} -2 \Ik{2} \zik{2}^T \ivk{k} \yik{2} -2 \zik{3}^T \iwk{k} \zik{2}\; +  \\ 
+ & \dots \; \; + \\
+ & \Ik{t-1} \zik{t-1}^T \ivk{k} \zik{t-1} + 2 \zik{t-1}^T \iwk{k} \zik{t-1} -2 \Ik{t-1} \zik{t-1}^T \ivk{k} \yik{t-1} -2 \zik{t}^T \iwk{0} \zik{t-1}\; +  \\ 
+ & \Ik{t} \zik{t}^T \ivk{k} \zik{t} + 2 \zik{t}^T \iwk{k} \zik{t} -2 \Ik{t} \zik{t}^T \ivk{k} \yik{t} \; \biggr) \biggr]d\zik{0} \dots d\zik{t}
+\end{align*}
+after a bit more rearranging and applying the reasoning above:
+\begin{align*}
+ \left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) & \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \cdot \\ 
+ \lint \exp \biggl[ -\frac{1}{2} \biggl( & \zik{0}^T \left( \iwk{0} + \iwk{k} \right) \zik{0} - 2 \left(\mik{0}^T \iwk{0}-\zik{1}^T \iwk{k} \right) \zik{0}\; +  \\
+ & \zik{1}^T \left(\Ik{1} \ivk{k} + 2 \iwk{k} \right) \zik{1} - 2 \left(\Ik{1} \yik{1}^T \ivk{k} - \zik{2}^T \iwk{k} \right) \zik{1}\; +  \\ 
+ & \zik{2}^T \left(\Ik{2} \ivk{k} + 2 \iwk{k} \right) \zik{2} - 2 \left( \Ik{2} \yik{2}^T \ivk{k} - \zik{3}^T \iwk{k} \right) \zik{2}\; +  \\ 
+ & \dots \; \; + \\
+ & \zik{t-1}^T \left(\ivk{k} + 2 \iwk{k} \right) \zik{t-1} - 2 \left(\Ik{t-1} \yik{t-1}^T \ivk{k} - \zik{t}^T \iwk{0} \right) \zik{t-1}\; +  \\ 
+ & \zik{t}^T \left(\Ik{t} \ivk{k} + 2 \iwk{k} \right) \zik{t} - 2 \Ik{t} \yik{t}^T \ivk{k} \zik{t} \; \biggr) \biggr]d\zik{0} \dots d\zik{t}
+\end{align*}
+Now for each $i$ there is an equation of the form $z^T A z - 2bz$ which means we can complete the square and integrate for each $i$ as follows:
+\begin{equation}
+\label{eq:comp_sq}
+\int_{-\infty}^{\infty} \exp \bigg[-\frac{1}{2} \left(z^T A z - 2bz \right) \bigg]dz = \sqrt{|2 \pi A|} \exp \bigg[-\frac{1}{2} b^T A b \bigg]. 
+\end{equation}
+So let $A_0 = \left( \iwk{0} + \iwk{k} \right)$ and $b_0 = \left(\mik{0}^T \iwk{0}-\zik{1}^T \iwk{k} \right)$ then:
+\begin{align*}
+\left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) & \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \sqrt{|2 \pi A_0|}    \lint \exp \bigg[-\frac{1}{2} b^T_0 A_0 b_0 \bigg] \cdot \exp \bigg[-\frac{1}{2} \left(\; \dots \; \right) \bigg]d\zik{1} \dots d\zik{t}\\ 
+\end{align*}
+Notice that $b_0$ contains a $\zik{1}$ term so we need to expand, rearrange and marginalise it out in the next step. Focussing just on the expansion of $\exp \left[-\frac{1}{2} b^T_0 A_0 b_0 \right] $:
+\begin{align*}
+ & \exp \bigg[ -\frac{1}{2} \left(\mik{0}^T \iwk{0}-\zik{1}^T \iwk{k} \right)^T A_0 \left(\mik{0}^T \iwk{0}-\zik{1}^T \iwk{k} \right) \bigg] \\
+  = & \exp \bigg[-\frac{1}{2} \left( \left(\mik{0}^T\iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right) + 2 \left(\zik{1}^T\iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right) + \left(\zik{1}^T\iwk{0} \right)^T A_0 \left(\zik{1}^T\iwk{0} \right) \right) \bigg]
+\end{align*}
+Combining this with the following term of the integral and dropping constants we get:
+\begin{align}
+\label{eq:exp_int}
+&\left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \sqrt{|A_0|} \exp\bigg[-\frac{1}{2} \bigg(\left(\mik{0}^T\iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right) \bigg) \bigg] \cdot \nonumber \\ 
+ & \lint \exp \bigg[ -\frac{1}{2} \bigg( \left( \zik{1}^T \iwk{0} \right)^T A_0 \left(\zik{1}^T \iwk{0} \right) + 2 \left(\zik{1}^T \iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right)\; + \nonumber \\
+& \zik{1}^T \left(\Ik{1} \ivk{k} + 2 \iwk{k} \right) \zik{1} - 2 \left(\Ik{1} \yik{1}^T \ivk{k} + \zik{2}^T \iwk{k} \right) \zik{1} \bigg) \bigg] \cdot \bigg[-\frac{1}{2} \left(\; \dots \; \right) \bigg] d\zik{1} \dots d\zik{t} 
+\end{align}
+Another expansion and rearrangement gives us (inside the integral):
+\begin{align}
+\label{eq:exp_iter}
+\exp \bigg[ -\frac{1}{2} \bigg( \zik{1}^T \left(\Ik{1} \iwk{k}A_0 \iwk{k} + \ivk{k} - 2 \iwk{k} \right) & \zik{1}  \nonumber \\ 
+ + 2 & \left(\Ik{1} \yik{1}^T \ivk{k} - \zik{2}^T \iwk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) \zik{1} \bigg) \bigg]
+\end{align}
+
+Letting:
+\begin{align*}
+A_1 & = \left(\iwk{k}A_0 \iwk{k} + \Ik{1} \ivk{k} - 2 \iwk{k} \right) \\
+b_1 & = \left(\Ik{1} \yik{1}^T \ivk{k} + \zik{2}^T \iwk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)
+\end{align*}
+we can complete the square again, getting from the second part of \ref{eq:comp_sq}:
+\begin{align*}
+&\exp \bigg[-\frac{1}{2} b_1^T A_1 b_1 \bigg] = \\
+&\exp \bigg[-\frac{1}{2} \bigg(\Ik{1} \yik{1}^T \ivk{k} - \zik{2}^T \iwk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \bigg)^T A_1 \bigg(\Ik{1} \yik{1}^T \ivk{k} - \zik{2}^T \iwk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \bigg) \bigg] \\
+= &\left(\Ik{1} \yik{1}^T \ivk{k} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} \right) + \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} \right) - \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} \right) + \\
+& \left(\Ik{1} \yik{1}^T \ivk{k} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) + \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) - \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) - \\
+& \left(\Ik{1} \yik{1}^T \ivk{k} \right)^T A_1 \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) - \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) + \\
+& \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)\\
+& \\
+= &\left(\Ik{1} \yik{1}^T \ivk{k} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} \right) - 2 \left(\Ik{1} \yik{1}^T \ivk{k} \right)^T A_1 \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) + \\
+& \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) + \\
+& \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) - 2 \zik{2}^T \left(\iwk{k}A_1\left(\iwk{k}A_0\mik{0}^T\iwk{0} - \Ik{1} \yik{1}^T \ivk{k} \right) \right).
+\end{align*}
+Returning to the integral in \ref{eq:exp_int} we have:
+\begin{align}
+\label{eq:exp_int1}
+&\left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \sqrt{|A_0||A_1|} \exp\bigg[-\frac{1}{2} \bigg(\left(\mik{0}^T\iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right) \bigg) \bigg] \cdot \nonumber \\ 
+& \exp\bigg[-\frac{1}{2} \bigg(\left(\Ik{1} \yik{1}^T \ivk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) \bigg) \bigg] \cdot \nonumber \\ 
+& \lint \exp \bigg[ -\frac{1}{2} \bigg( \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) - 2 \zik{2}^T \left(\iwk{k}A_1\left(\iwk{k}A_0\mik{0}^T\iwk{0} - \Ik{1} \yik{1}^T \ivk{k} \right) \right)\; + \nonumber \\
+& \zik{2}^T \left(\Ik{2} \ivk{k} + 2 \iwk{k} \right) \zik{2} - 2 \left(\Ik{2} \yik{2}^T \ivk{k} + \zik{3}^T \iwk{k} \right) \zik{2} \bigg) \bigg] \cdot \bigg[-\frac{1}{2} \left(\; \dots \; \right) \bigg] d\zik{2} \dots d\zik{t} 
+\end{align}
+If a marginalisation over another state iteration $\zik{2}$ is carried out from Equation \ref{eq:exp_iter} to Equation \ref{eq:exp_int1} we get:
+\begin{align}
+\label{eq:exp_int2}
+&\left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \sqrt{|A_0||A_1||A_2|} \exp\bigg[-\frac{1}{2} \bigg(\left(\mik{0}^T\iwk{0} \right)^T A_0 \left(\mik{0}^T\iwk{0} \right) \bigg) \bigg] \cdot \nonumber \\ 
+& \exp\bigg[-\frac{1}{2} \bigg(\left(\Ik{1} \yik{1}^T \ivk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right)^T A_1 \left(\Ik{1} \yik{1}^T \ivk{k} - \iwk{k}A_0\iwk{k}\mik{0}^T \iwk{0} \right) \bigg) \bigg] \cdot \nonumber \\ 
+\begin{split}
+\exp\bigg[-\frac{1}{2} \bigg(\left(\ivk{k} \left( \Ik{2} \yik{2}^T - \iwk{k} A_1 \yik{1}^T \Ik{1} \right) + \iwk{k} A_1 \iwk{k} A_0 \mik{0}^T \iwk{0}\right)^T A_2 \nonumber \\
+\left(\ivk{k} \left( \Ik{2} \yik{2}^T \ivk{k} - \iwk{k} A_1 \yik{1}^T \Ik{1} \right) + \iwk{k} A_1 \iwk{k} A_0 \mik{0}^T \iwk{0}\right) \bigg) \bigg] \cdot \nonumber
+\end{split} \\
+& \lint \exp \bigg[ -\frac{1}{2} \bigg( \left(\zik{2}^T \iwk{k} \right)^T A_1 \left(\zik{2}^T \iwk{k} \right) - 2 \zik{2}^T \left(\iwk{k}A_1\left(\iwk{k}A_0\mik{0}^T\iwk{0} - \Ik{1} \yik{1}^T \ivk{k} \right) \right)\; + \nonumber \\
+& \zik{2}^T \left(\Ik{2} \ivk{k} + 2 \iwk{k} \right) \zik{2} - 2 \left(\Ik{2} \yik{2}^T \ivk{k} + \zik{3}^T \iwk{k} \right) \zik{2} \bigg) \bigg] \cdot \bigg[-\frac{1}{2} \left(\; \dots \; \right) \bigg] d\zik{3} \dots d\zik{t} 
+\end{align}
+Where
+\begin{align*}
+A_2 & = \left(\iwk{k}A_1 \iwk{k} + \Ik{1} \ivk{k} - 2 \iwk{k} \right) \\
+b_2 & = \left( \ivk{k} \left( \Ik{2} \yik{2}^T - \iwk{k} A_1 \yik{1}^T \Ik{1} \right) + \iwk{k} A_1 \iwk{k} A_0 \mik{0}^T \iwk{0} + \zik{3}^T \iwk{k} \right)
+\end{align*}
+
+Given that A, B are symmetric, positive-definite matrices $AB = (AB)^T = B^TA^T = BA$ and the previous note \ref{eq:lin1} we can take out common factors and rearrange matrices for example:
+\begin{align}
+\label{eq:lin2}
+& ABA\mik{0}^TB = ABABB\mik{0} = AABBB\mik{0}.
+\intertext{and}
+& A\yik{i}^TB + B\mik{0}^TC =  AB\yik{i} + B\mik{0}^TC = BA\yik{i} + B\mik{0}^TC = B(A\yik{i} + \mik{0}^TC)
+\end{align}
+Then looking at Equation \ref{eq:exp_int1} and Equation \ref{eq:exp_int2} a pattern emerges and we have:
+\begin{align*}
+A_t & = \left(\iwk{k}A_{t-1} \iwk{k} + \Ik{t} \ivk{k} - 2 \iwk{k} \right) \\
+b_t & = (-1)^t (\iwk{k})^{t} \mik{0}^T \iwk{0} \lprod_{j=1}^{t-1} A_j + \ivk{k}\left(\Ik{t}\yik{t}^T + \sum_{j=1}^{t-1} (-1)^{j-1} \Ik{j} \yik{j} (\iwk{k})^{t-j} \lprod_{m=j}^{t-1} A_m \right)  + \zik{t+1}^T \iwk{k}
+\end{align*}
+Which, if we return to \ref{eq:kint}, leads to:
+\begin{align*}
+& \lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \vk)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, T)d\zik{0} \dots d\zik{t} \propto \\ 
+&\left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \exp \left[-\frac{1}{2} \sum_{i = 1}^T \Ik{i} \yik{i}^T \ivk{k} \yik{i} \right] \sqrt{\lprod_{i = 1}^{t}|A_i|} \exp\bigg[-\frac{1}{2} \left( d_0^T A_0d_0 + \sum_{i = 1}^t d_i^T A_i d_i \right) \bigg]\\
+\intertext{where}
+&A_i = \iwk{k}A_{i-1} \iwk{k} + \Ik{i} \ivk{k} - 2 \iwk{k} \\
+&d_i = (-1)^i (\iwk{k})^{i} \mik{0}^T \iwk{0} \lprod_{j=1}^{i-1} A_j + \ivk{k}\left(\Ik{i}\yik{i}^T + \sum_{j=1}^{i-1} (-1)^{j-1} \Ik{j} \yik{j} (\iwk{k})^{i-j} \lprod_{m=j}^{i-1} A_m \right) 
+\end{align*}
+While computation has not yet been considered it is clear that this recursive algorithm will suffer from the dimension of the response vector with several matrix calculations at each iteration. There are efficient methods for multiplying symmetric, positive definite matrices in a numerically stable manner using Cholesky decomposition but this is yet to be implemented.
+
+
+\end{document}

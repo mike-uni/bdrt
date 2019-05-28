@@ -1,0 +1,53 @@
+\chapter{The Base Case}
+\label{basecase}
+
+This section describes the simplest case in which there is a single fixed tree based on the classical CART algorithm of Breiman et. al. \cite{regtree} and a first-order polynomial model. The case to be argued here is that combining two well known models into a single framework has benefits to the analyst, even in its most simple formulation. This section also serves as a basis for the construction of more complicated models.
+  
+The CART regression tree models the following relationship:
+\[ Y_t = f(X_t, \upsilon_t) \] 
+where $X_t$ are explanatory covariates, and $\upsilon_t$ are the errors in estimating $Y_t$ and $f$ is the tree mapping between the observations and explanatory variables. 
+
+A fixed tree model implies:
+\begin{enumerate}
+\item $\kt$ leaves and $\kt -1$ internal nodes,
+\item which implies a fixed number number of known covariates with fixed threshold values,
+\item and a fixed number of Kalman filters (KFs).
+\item If it is additionally assumed that $\la = \ls$ (that the rate of arrival of inputs is that same as the rate of computation) then \textit{apriori} it can be assumed that the leaves have probability $\frac{1}{\kt}$ of updating at each iteration. We also assume discrete time iterations.
+\end{enumerate}
+
+The model at each leaf $k$ of the tree is:
+\begin{subequations}
+\label{baseleaf}
+\begin{alignat}{2}
+y_t &= \zik{t} + \vik{t};&\quad& \vik{t} \sim N(0, \Vk{t}) \\
+\zik{t} &= \zik{t-1} + \wik{t};&\quad& \wik{t} \sim N(0, \Wk{t})
+\end{alignat}
+\end{subequations}
+with initial conditions, $\zik{0} \sim N(\mik{0},\;\Sik{0})$. These parameters, $\mik{0},\;\Sik{0}$, are set to the sample mean and variance of the leaves to which the filters correspond but could be set to any appropriate value. Some final assumptions in this simplest of models is that $\yik{t}, \zik{t}, \Vk{t}$ and $\Wk{t}$ are one-dimensional and that both $\Vk{t}$ and $\Wk{t}$ are constant over $t$, known and the same for each leaf, and that the $E[\vik{t}, \wik{t}] = 0$, i.e. no autocorrelation.
+
+The combination of these models then explains:
+\[ Y_t = f(X_t,\; \Theta,\; \epsilon_t) \]
+where now $\Theta$ is a vector of parameters that include ${\zit{1}, y_{1:t-1}, \Vk{t}, \Wk{t}, \Upsilon_t}$ and $\epsilon_t$ is the overall error of the model which is some combination of the errors of regression tree, the measurement equation and the state equation. These three different errors can be explained by considering that a process $\yik{t}$ can be observed (and measured) with some error $\vik{t}$, one can attempt to explain this process via a regression tree $f$ of the possible states of the process at each time $t$ with some error $\upsilon$ but even then, there may be some latent process $\zik{t}$ that also explains $\yik{t}$ but because it is both latent and evolving in time, it cannot be included as a covariate in the tree model. This latent process or signal has some uncertainty associated with it, $\wik{t}$, in part caused by the simplifying Markov assumption.
+
+The link between the two models is that they both model $E[Y_t\;|\;X_t,\;\Theta] = \bar{y_k} = \zik{t}$ where $\bar{y_k}$ is the sample average at each leaf, which can also be considered as an unobserved parameter, and $\zik{t}$ is the mean estimate of the process $\yik{t}$. In brief, a tree is being used at each $t$ to model various possible states of the process $\yik{t}$. 
+
+\subsection{Updating Equations}
+At each $t$ a node is first selected and then inference on the leaf is performed. Every leaf is processed according to the intermittent Kalman filter \cite{sinopoli} and as such only the selected leaf will perform the forecast and update step (adapted from \cite{west}) while the other leaves only propagate the prior under the assumption that the next value of the state in that partition is the same as the previous state but with a linear increase in uncertainty. $\tet$ is an indicator variable over the partitions. If $\tet = k$ then $y_t$ is observed at the leaf selected by covariates $x_t$ from tree $T$ at time $t$. Else $\tet \neq k$ hence $y_t$ is not observed and distributions propagate under the constant assumption.
+ 
+Using Equations \ref{baseleaf} we have the following:
+\begin{subequations}
+\label{basedist}
+\begin{alignat}{3}
+\text{Prior for}\; z_t: &\quad& \zik{t} \;|\; \zik{t-1}\; \sim N(\mik{t-1},\; R_t); &\qquad& R_t = \Sik{t-1} + \Wk{t} \\
+1\text{-step forescast}: &\quad& \yik{t} \;|\; \zik{t-1}\; \sim N(\mik{t-1},\; Q_t); &\qquad& Q_t = R_t + \Vk{t} \\
+\text{Posterior for}\; z_t: &\quad& \zik{t} \;|\; \yik{t}\; \sim N(\mik{t},\; \Sik{t}); 
+\end{alignat}
+\end{subequations}
+where
+\begin{subequations}
+\label{baseupdate}
+\begin{align}
+\mik{t} &= \mik{t-1} + K_t(e_t) \\
+\Sik{t} &= K_t\Vk{t} \\
+\K_t = R_t/Q
+\end{align}
