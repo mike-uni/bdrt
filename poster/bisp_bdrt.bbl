@@ -1,0 +1,367 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{bcart}{article}{}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=0492094e00a4a43a0f2762c774f0cfa5}{%
+           family={Chipman},
+           familyi={C\bibinitperiod},
+           given={Hugh\bibnamedelima A},
+           giveni={H\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=9174a7767b3206b971013dd7014dee8f}{%
+           family={George},
+           familyi={G\bibinitperiod},
+           given={Edward\bibnamedelima I},
+           giveni={E\bibinitperiod\bibinitdelim I\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=a712e786204efb9040d6628622e204b0}{%
+           family={McCulloch},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima E},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis Group}%
+      }
+      \strng{namehash}{3ad7abfa27c6aa7b9438f605c2981672}
+      \strng{fullhash}{a3f2690aaceb8d82f8abf7f0eca06f33}
+      \strng{bibnamehash}{a3f2690aaceb8d82f8abf7f0eca06f33}
+      \strng{authorbibnamehash}{a3f2690aaceb8d82f8abf7f0eca06f33}
+      \strng{authornamehash}{3ad7abfa27c6aa7b9438f605c2981672}
+      \strng{authorfullhash}{a3f2690aaceb8d82f8abf7f0eca06f33}
+      \field{sortinit}{C}
+      \field{sortinithash}{963e9d84a3da2344e8833203de5aed05}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the American Statistical Association}
+      \field{number}{443}
+      \field{title}{Bayesian CART model search}
+      \field{volume}{93}
+      \field{year}{1998}
+      \field{pages}{935\bibrangedash 948}
+      \range{pages}{14}
+    \endentry
+    \entry{bart}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=0492094e00a4a43a0f2762c774f0cfa5}{%
+           family={Chipman},
+           familyi={C\bibinitperiod},
+           given={Hugh\bibnamedelima A},
+           giveni={H\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=9174a7767b3206b971013dd7014dee8f}{%
+           family={George},
+           familyi={G\bibinitperiod},
+           given={Edward\bibnamedelima I},
+           giveni={E\bibinitperiod\bibinitdelim I\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=a712e786204efb9040d6628622e204b0}{%
+           family={McCulloch},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima E},
+           giveni={R\bibinitperiod\bibinitdelim E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Institute of Mathematical Statistics}%
+      }
+      \strng{namehash}{3ad7abfa27c6aa7b9438f605c2981672}
+      \strng{fullhash}{014bd85833965e55646cb1288982e235}
+      \strng{bibnamehash}{014bd85833965e55646cb1288982e235}
+      \strng{authorbibnamehash}{014bd85833965e55646cb1288982e235}
+      \strng{authornamehash}{3ad7abfa27c6aa7b9438f605c2981672}
+      \strng{authorfullhash}{014bd85833965e55646cb1288982e235}
+      \field{sortinit}{C}
+      \field{sortinithash}{963e9d84a3da2344e8833203de5aed05}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The Annals of Applied Statistics}
+      \field{number}{1}
+      \field{title}{BART: Bayesian additive regression trees}
+      \field{volume}{4}
+      \field{year}{2010}
+      \field{pages}{266\bibrangedash 298}
+      \range{pages}{33}
+    \endentry
+    \entry{geyer}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=0d04c9d7c7657b4a8dcbee292b6d0254}{%
+           family={Geyer},
+           familyi={G\bibinitperiod},
+           given={Charles\bibnamedelima J},
+           giveni={C\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=9e59c4df695bd506abc7725c2e724e2a}{%
+           family={Thompson},
+           familyi={T\bibinitperiod},
+           given={Elizabeth\bibnamedelima A},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis}%
+      }
+      \strng{namehash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \strng{fullhash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \strng{bibnamehash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \strng{authorbibnamehash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \strng{authornamehash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \strng{authorfullhash}{f5ef0b89bb29987d0f461ad6c1a31a9e}
+      \field{sortinit}{G}
+      \field{sortinithash}{5e8d2bf9d38de41b1528bd307546008f}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the American Statistical Association}
+      \field{number}{431}
+      \field{title}{Annealing Markov chain Monte Carlo with applications to ancestral inference}
+      \field{volume}{90}
+      \field{year}{1995}
+      \field{pages}{909\bibrangedash 920}
+      \range{pages}{12}
+    \endentry
+    \entry{gramacy}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=083a20d2b74d60aaed3505e353d07579}{%
+           family={Gramacy},
+           familyi={G\bibinitperiod},
+           given={Robert\bibnamedelima B},
+           giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=21c12c50dc40af1ca435daff82ba1ee0}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Herbert\bibnamedelimb K.\bibnamedelimi H},
+           giveni={H\bibinitperiod\bibinitdelim K\bibinitperiod\bibinitdelim H\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor & Francis}%
+      }
+      \strng{namehash}{9485ccdaf697211cdcec4e63476bf356}
+      \strng{fullhash}{9485ccdaf697211cdcec4e63476bf356}
+      \strng{bibnamehash}{9485ccdaf697211cdcec4e63476bf356}
+      \strng{authorbibnamehash}{9485ccdaf697211cdcec4e63476bf356}
+      \strng{authornamehash}{9485ccdaf697211cdcec4e63476bf356}
+      \strng{authorfullhash}{9485ccdaf697211cdcec4e63476bf356}
+      \field{sortinit}{G}
+      \field{sortinithash}{5e8d2bf9d38de41b1528bd307546008f}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the American Statistical Association}
+      \field{number}{483}
+      \field{title}{Bayesian Treed Gaussian Process Models With an Application to Computer Modeling}
+      \field{volume}{103}
+      \field{year}{2008}
+      \field{pages}{1119\bibrangedash 1130}
+      \range{pages}{12}
+    \endentry
+    \entry{mehra}{article}{}
+      \name{author}{1}{}{%
+        {{uniquename=0,uniquepart=base,hash=cb8e2b4989327662d53bc67113397914}{%
+           family={{Mehra}},
+           familyi={M\bibinitperiod},
+           given={R.},
+           giveni={R\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{cb8e2b4989327662d53bc67113397914}
+      \strng{fullhash}{cb8e2b4989327662d53bc67113397914}
+      \strng{bibnamehash}{cb8e2b4989327662d53bc67113397914}
+      \strng{authorbibnamehash}{cb8e2b4989327662d53bc67113397914}
+      \strng{authornamehash}{cb8e2b4989327662d53bc67113397914}
+      \strng{authorfullhash}{cb8e2b4989327662d53bc67113397914}
+      \field{sortinit}{M}
+      \field{sortinithash}{cfd219b90152c06204fab207bc6c7cab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0018-9286}
+      \field{journaltitle}{IEEE Transactions on Automatic Control}
+      \field{month}{4}
+      \field{number}{2}
+      \field{title}{On the identification of variances and adaptive Kalman filtering}
+      \field{volume}{15}
+      \field{year}{1970}
+      \field{pages}{175\bibrangedash 184}
+      \range{pages}{10}
+      \keyw{Adaptive Kalman filtering;Linear systems,time-invariant discrete-time;Kalman filters;Adaptive filters;Vectors;Q measurement;Covariance matrix;Steady-state;Filtering;Noise measurement;Testing;State estimation}
+    \endentry
+    \entry{singpur}{article}{}
+      \name{author}{2}{}{%
+        {{uniquename=0,uniquepart=base,hash=d0204ab685af89ac2f32a4acc216f819}{%
+           family={Meinhold},
+           familyi={M\bibinitperiod},
+           given={Richard\bibnamedelima J},
+           giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=16d91e94b600053f40e8aeea86271a35}{%
+           family={Singpurwalla},
+           familyi={S\bibinitperiod},
+           given={Nozer\bibnamedelima D},
+           giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis Group}%
+      }
+      \strng{namehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{fullhash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{bibnamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authorbibnamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authornamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authorfullhash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \field{sortinit}{M}
+      \field{sortinithash}{cfd219b90152c06204fab207bc6c7cab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The American Statistician}
+      \field{number}{2}
+      \field{title}{Understanding the Kalman filter}
+      \field{volume}{37}
+      \field{year}{1983}
+      \field{pages}{123\bibrangedash 127}
+      \range{pages}{5}
+    \endentry
+    \entry{sinopoli}{article}{}
+      \name{author}{6}{}{%
+        {{uniquename=0,uniquepart=base,hash=71bb21ce067a0f96b9fa070963519148}{%
+           family={Sinopoli},
+           familyi={S\bibinitperiod},
+           given={Bruno},
+           giveni={B\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=aec3f05521fca1bd73ebbb1ef781e01e}{%
+           family={Schenato},
+           familyi={S\bibinitperiod},
+           given={Luca},
+           giveni={L\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=44f9b671942bb2e4a2477717529f1d52}{%
+           family={Franceschetti},
+           familyi={F\bibinitperiod},
+           given={Massimo},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=a1613e53cc38aed6549280ec5c477d4d}{%
+           family={Poolla},
+           familyi={P\bibinitperiod},
+           given={Kameshwar},
+           giveni={K\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=996ffb9cb286a8b4b0fc16793c54cc31}{%
+           family={Jordan},
+           familyi={J\bibinitperiod},
+           given={Michael\bibnamedelima I},
+           giveni={M\bibinitperiod\bibinitdelim I\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=f862c7fc9dbc96d7eb2452749752a5f3}{%
+           family={Sastry},
+           familyi={S\bibinitperiod},
+           given={Shankar\bibnamedelima S},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE}%
+      }
+      \strng{namehash}{15b4bb67b64675b9f17c05fe49c74f85}
+      \strng{fullhash}{f873dd9cd1171385ac81a3f64f9a5da1}
+      \strng{bibnamehash}{f873dd9cd1171385ac81a3f64f9a5da1}
+      \strng{authorbibnamehash}{f873dd9cd1171385ac81a3f64f9a5da1}
+      \strng{authornamehash}{15b4bb67b64675b9f17c05fe49c74f85}
+      \strng{authorfullhash}{f873dd9cd1171385ac81a3f64f9a5da1}
+      \field{sortinit}{S}
+      \field{sortinithash}{322b1d5276f2f6c1bccdcd15920dbee6}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE transactions on Automatic Control}
+      \field{number}{9}
+      \field{title}{Kalman filtering with intermittent observations}
+      \field{volume}{49}
+      \field{year}{2004}
+      \field{pages}{1453\bibrangedash 1464}
+      \range{pages}{12}
+    \endentry
+    \entry{taddy}{article}{}
+      \name{author}{3}{}{%
+        {{uniquename=0,uniquepart=base,hash=f3097084770d6c4925f718ac02f2f4c6}{%
+           family={Taddy},
+           familyi={T\bibinitperiod},
+           given={Matthew\bibnamedelima A},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=083a20d2b74d60aaed3505e353d07579}{%
+           family={Gramacy},
+           familyi={G\bibinitperiod},
+           given={Robert\bibnamedelima B},
+           giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod},
+           givenun=0}}%
+        {{uniquename=0,uniquepart=base,hash=33cd40b93562b2c28bcf023153c565a8}{%
+           family={Polson},
+           familyi={P\bibinitperiod},
+           given={Nicholas\bibnamedelima G},
+           giveni={N\bibinitperiod\bibinitdelim G\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis}%
+      }
+      \strng{namehash}{2a29830a26b672501837fcd3ac80d4a8}
+      \strng{fullhash}{08a04ed51f8211d2112835c3d31ac0a3}
+      \strng{bibnamehash}{08a04ed51f8211d2112835c3d31ac0a3}
+      \strng{authorbibnamehash}{08a04ed51f8211d2112835c3d31ac0a3}
+      \strng{authornamehash}{2a29830a26b672501837fcd3ac80d4a8}
+      \strng{authorfullhash}{08a04ed51f8211d2112835c3d31ac0a3}
+      \field{sortinit}{T}
+      \field{sortinithash}{6f7aff9db9dcfeb7f95fd5bbd2f78df9}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{year}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the American Statistical Association}
+      \field{number}{493}
+      \field{title}{Dynamic trees for learning and design}
+      \field{volume}{106}
+      \field{year}{2011}
+      \field{pages}{109\bibrangedash 123}
+      \range{pages}{15}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

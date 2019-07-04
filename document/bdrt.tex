@@ -6,7 +6,7 @@
 
 \renewcommand{\baselinestretch}{1.0}
 
-\usepackage{amsmath, amssymb, amsthm, bm, standalone, enumerate, parskip, graphicx, float, mathtools, array, eurosym, tabularx, url, setspace}
+\usepackage{amsmath, amssymb, amsthm, bm, standalone, enumerate, parskip, graphicx, float, mathtools, array, eurosym, tabularx, url, setspace, algorithm}
 
 %\usepackage{fleqn}
 %\usepackage{algorithms}
@@ -39,18 +39,23 @@
 \newcommand{\ivk}[1]{V_{#1}^{-1}}
 \newcommand{\iwk}[1]{W_{#1}^{-1}}
 
+\newcommand{\vk}{V_k}
+\newcommand{\wk}{W_k}
+
 \DeclareMathOperator{\giv}{\, | \,}
 
 \DeclareMathOperator{\lint}{\displaystyle\int}
 \DeclareMathOperator{\lprod}{\displaystyle\prod}
+
+\DeclareMathSizes{10}{9}{7}{5}
 
 % Graphics path
 \graphicspath{{images/}}
 
 \onehalfspacing
 
-%Per Chpater include
-\includeonly{basecase}
+%Per Chapter include
+\includeonly{linear_kalman}
 
 % Title
 \title{\LARGE{Bayesian Dynamic Regression Trees} \\
@@ -73,7 +78,8 @@ Supervisor: Professor Simon Wilson}
 \include{intro}
 \include{theory}
 \include{method}
-\include{basecase}
+\include{linear_kalman}
+\include{LKMW}
 \include{model}
 \include{experiments}
 \include{results}
@@ -85,8 +91,7 @@ Supervisor: Professor Simon Wilson}
 \include{appendixa}
 \include{appendixb}
 
-
-%\backmatter
+\backmatter
 %\chapter*{Bibliography}
 %\label{bib}
 %\printbibliography
