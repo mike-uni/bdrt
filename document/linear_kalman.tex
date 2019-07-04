@@ -1,0 +1,241 @@
+\section{Linear Kalman Model}
+\subsection{The Independent Filter Model}
+\label{sec:if_model}
+We are trying to find the joint probability of $K_T$ independent linear Kalman filters. The joint probability model is:
+\begin{flalign}
+\label{eq:if_model}
+p(T, z^t, y^t \, | \, \theta_T, x^t, u^t) &= \: p(T) \, p(z_0 \, | \, T, \theta_T)
+\prod_{i=1}^t p(y_i \, | \, T, \theta_T, x_i, z_i) \, p(z_i \, | \, T, \theta_T, z_{i-1}).&&
+\end{flalign} 
+The goal is to compute the posterior
+\begin{flalign}
+\label{eq:if_post}
+p(T, z^t \, | \, \theta_T, x^t, y^t) &= p(T \, | \, \theta_T, x^t, y^t) \: p(z^t \, | \, T, \theta_T, x^t, y^t) \\
+ &= p(T \, | \, \theta_T, x^t, y^t) \: \prod_{k=1}^{K_T} p(z_{tk} \, | \, T, \theta_T, x^t, y^t).&&
+\end{flalign}
+The base model assumes that all parameters are known and constant. This includes $x^{[\;]}$ which are the boundaries of the known predictor variables. 
+\begin{flalign}
+\label{eq:if_params}
+\theta_T = (H, F, V, W, G, \mu_0, W_0, \alpha, \beta, x^{[\;]})&&
+\end{flalign}
+where $H \in \mathbb{R}^{n \times m},\: V \in \mathbb{R}^{n \times n},\: F, W, W_0 \in \mathbb{R}^{m \times m},\: G \in \mathbb{R}^{m \times r}$, $\alpha, \beta$ are scalars and $x^{[\;]}$ is a pair indicating boundary limits according to predictor type.
+We assume that at each leaf we have a linear Kalman Filter with additive Gaussian noise. Assume that the following relationship between the observations and latent state holds:
+\begin{flalign}
+\label{eq:if_lkal}
+y_t & = H_k z_{tk} + v_t, \; v_t \sim N(0, V_k), \\
+z_{tk} & = F_k z_{t-1,k} + w_t, \; w_t \sim N(0,W_k).&&
+\end{flalign}
+Then the model for each $k$ is:
+\begin{flalign}
+\label{if_modk}
+&z_0 \sim N(\mu_0, W_0); \\
+&z_t \, | \, z_{t-1} \sim N(F z_{t-1} + G u_t, W); \\
+&y_t \, | \, x_t, z_t \sim N(H z_t, V).&&
+\end{flalign}
+Following the derivations of \cite{singpur} we can find closed form expressions for posterior distributions: 
+\begin{flalign}
+\label{eq:if_leafpost}
+&z_{t-1} \, | \, u^{t-1}, y^{t-1}, \theta \sim N(\hat{\mu}_{t-1}, \hat{\Sigma}_{t-1}); \\
+&z_{t} \, | \, u^{t}, y^{t-1}, \theta \sim N(F \hat{\mu}_{t-1}, R_t); \\
+&y_{t} \, | \, u^{t}, y^{t-1}, \theta \sim N(G u_{t} + H F \hat{\mu}_{t-1}, Q_t), &&
+\end{flalign}
+and optimal estimates for the state and state variance, given the latest update $y_t$ from the data, are recursively defined as:
+\begin{flalign}
+\label{eq:if_update}
+\hat{\mu}_0     & = \mu_0 \mbox{ and } \hat{\Sigma}_0  \: = \: \Sigma_0;  \\
+\hat{\mu}_{t} & = F \hat{\mu}_{t-1} + K_t (y_{t} - F H \hat{\mu}_{t-1} - G u_{t}); \\
+\hat{\Sigma}_{t} & = R_{t} - K_t H R_{t} = (I - K H) R_t, &&
+\end{flalign}
+where 
+\begin{flalign}
+\label{eq:if_update2}
+R_{t} & = F^T \hat{\Sigma}_{t-1} F + W \\
+Q_{t} & = H^T R_{t} H + V \\
+K_{t} & = R_{t}^T H^T Q_t^{-1}.&&
+\end{flalign} 
+\subsection{Derivation of the Multivariate Marginal Posterior of $T$}
+\label{sec:if_multipost}
+The posterior equation in \ref{eq:if_post} constists of two parts, the first is the marginal of the tree posterior and the second is the marginal of the latent variable. As shown above, an exact distribution for the marginal of $z_t \giv y_t$ can be found using the Kalman Filter. The derivation of the second part, the marginal of the tree, is derived below.\\  
+The aim is to find an expression for:
+\begin{flalign}
+ p(\,T \giv y^t, \theta_T, x^t) & \propto p(T)p(y^t \giv T, \theta_T, x^t) \\
+& = p(T) \lint p(y^t \giv z^t, \theta_T, x^t)p(z^t \giv T, \theta_T, x^t)\; d z^t, \\
+\intertext{and if we apply the independent filter assumption of this model we get;} 
+& = p(T) \lint p(z_0 \giv T, \theta_T) \lprod_{i = 1}^t p(y_i \giv z_i, T, x_i, \theta_T)\\
+& \qquad \cdot \lprod_{k = 1}^{K_T} p(\zik{i} \giv \zik{i-1}, u_t, T, x_i, \theta_T) \; d z^t &&
+\end{flalign}
+To indicate that a leaf has been selected by a predictor we use
+\begin{flalign*}
+\Ik{i} = \begin{cases}
+1, & \text{if}\; \eta(x_i, T) = k \\
+0, & \text{otherwise}
+\end{cases}&&
+\end{flalign*}
+to get:
+\begin{flalign*}
+p(y_i \giv z_i, T, x_i, \theta_T) & = p(y_i \giv z_{i, \eta(x_i, T)}, \theta_T) = \lprod^K_{k=1} p(y_i \giv \zik{i}, \theta_T)^{\Ik{i}}&&
+\end{flalign*}
+and hence we have:
+\begin{flalign}
+p(T \giv y^t, x^t, \theta_T) & \propto p(T) \lint \lprod^K_{k = 1} p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, \theta_T)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, u_t T) d z^t &&
+\end{flalign}
+Dropping $\theta_T\; \text{and}\; x_i$ because they are known and fixed, we can completely factorise everything inside the integral by $k$ producing:
+\begin{flalign}
+p(T \giv y^t) = p(T) \lprod^K_{k = 1} \lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, T)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, u_t, T) d z^t_k &&
+\end{flalign}
+Each integral is the same (up to index $k$) so the focus is on deriving:
+\begin{flalign}
+\label{eq:if_kint}
+\lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i})^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, u_i, T) d z^t_k &&
+\end{flalign}
+for some $k$. \\
+For the distribution of the initialisation parameters $\mu_0\; \text{and}\; \Sigma_0$ we have:
+\begin{flalign}
+p(\zik{0}) = (|2 \pi W_0|)^{-\frac{1}{2}} \exp \left[- \frac{1}{2}(\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0})\right] &&
+\end{flalign}
+and for each subsequent iteration we model the distribution of the state as
+\begin{flalign}
+p(\zik{t} \giv \zik{t-1}, u_t) = (|2 \pi \wk |)^{-\frac{1}{2}}\exp \left[- \frac{1}{2}(\zik{i} - (F\zik{i-1}+Gu_t)^T \iwk{k} (\zik{i} - (F\zik{i-1}+Gu_t)\right]. &&
+\end{flalign}
+The joint distribution for the exchangable observations is
+\begin{flalign}
+\lprod_{i = 1}^t p(y_i \giv \zik{i})^{\Ik{i}} & = (|2 \pi \vk|)^{\frac{\Ik{i}}{2}} \exp \left[- \frac{1}{2} \sum^{t}_{i = 1} \Ik{i} (\yik{i} - H\zik{i})^T \ivk{k} (\yik{i} - H\zik{i})\right].&&
+\end{flalign}
+Dropping constant terms (keeping those dependent on the choice of leaf) Equation \ref{eq:if_kint} becomes:
+\begin{flalign}
+\label{eq:if_lin1}
+&\lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i})^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, u_i, T)d z^t_k \propto \\ 
+& \qquad \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \lint \exp \left[- \frac{1}{2}(\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0}) \right] \\
+& \qquad\qquad \cdot \exp \left[ - \frac{1}{2} \sum^{t}_{i = 1} \Ik{i} (\yik{i} - H \zik{i})^T \ivk{k} (\yik{i} - H \zik{i})\right] \\ 
+& \qquad\qquad\qquad \cdot \exp \left[ - \frac{1}{2}(\zik{i} - (F \zik{i-1}+G u_i))^T \iwk{k} (\zik{i} - (F\zik{i}+Gu_i))\right] d z^t.&&
+\end{flalign}
+Expanding the second integral of \ref{eq:if_lin1} and rearranging we get:
+\begin{flalign*}
+\lint \exp \biggl[ & -\frac{1}{2} \biggl( (\zik{0} - \mik{0})^T \iwk{0} (\zik{0} - \mik{0})\; +  \\
+ & \Ik{1} \left(\yik{1} - H\zik{1})^T \ivk{k} (\yik{1} - H\zik{1}) \right)\; + \\
+ & \qquad\qquad(\zik{1} - (F\zik{0}+Gu_i))^T \iwk{k} (\zik{1} - (F\zik{0}+Gu_i))\; +\\ 
+ & \Ik{2} \left( (\yik{2} - H\zik{2})^T \ivk{k} (\yik{2} - H\zik{2}) \right)\; + \\
+ &\qquad\qquad(\zik{2} - (F\zik{1}+Gu_i))^T \iwk{k} (\zik{2} - (F\zik{1}+Gu_i))\; +\\
+ & \dots \; \; + \\
+ & \Ik{t-1} \left( (\yik{t-1} - H\zik{t-1})^T \ivk{k} (\yik{t-1} - H\zik{t-1}) \right)\;+ \\
+ &\qquad\qquad(\zik{t-1} - (F\zik{t-2}+Gu_i))^T \iwk{k} (\zik{t-1} - (F\zik{t-2}+Gu_i))\;+ \\
+ & \Ik{t} \left( (\yik{t} - H\zik{t})^T \ivk{k} (\yik{t} - H\zik{t}) \right) + \\
+ &\qquad\qquad(\zik{t} - (F\zik{t-1}+Gu_i))^T \iwk{k} (\zik{t} - (F\zik{t-1}+Gu_i)) \biggr) \biggr]d z^t. &&
+\end{flalign*}
+Further simplifying each of the quadratic forms and bearing mind that because all covariance matrices are symmetric, positive semi-definite, their inverses are too and hence:
+\begin{flalign*}
+\lint \exp \biggl[-\frac{1}{2} \biggl(
+ &\zik{0}^T \iwk{0} \zik{0} - 2 \mik{0}^T \iwk{0} \zik{0} + \mik{0} \iwk{0} \mik{0} \; +  \\
+ & \Ik{1} \left(\yik{1}^T \ivk{k} \yik{1} -2 \zik{1}^T \ivk{k} H \yik{1} + \zik{1}^T H^T \ivk{k} H \zik{1} \right) + \\
+ &\qquad \zik{1}^T\iwk{k}\zik{1} - 2\zik{1}^T\iwk{k}F\zik{0} + \zik{0}^TF^T\iwk{k}F\zik{0}\; - \\
+ &\qquad\qquad 2\zik{1}^T\iwk{k}Gu_1 + 2\zik{0}^TF^T\iwk{k}Gu_1 + u_1^TG^T\iwk{k}Gu_1\; + \\
+ & \Ik{2} \left(\yik{2}^T \ivk{k} \yik{2} -2 \zik{2}^T \ivk{k} H \yik{2} + \zik{2}^T H^T \ivk{k} H \zik{2} \right) + \\
+ &\qquad \zik{2}^T\iwk{k}\zik{2} - 2\zik{2}^T\iwk{k}F\zik{1} + \zik{1}^TF^T\iwk{k}F\zik{1}\; - \\
+ &\qquad\qquad 2\zik{2}^T\iwk{k}Gu_2 + 2\zik{1}^TF^T\iwk{k}Gu_2 + u_2^TG^T\iwk{k}Gu_2\; + \\
+ & \dots \; \; + \\
+ & \Ik{t-1} \left(\yik{t-1}^T\ivk{k}\yik{t-1} -2 \zik{t-1}^T\ivk{k}H\yik{t-1} + \zik{t-1}^TH^T\ivk{k}H\zik{t-1} \right) + \\
+ &\qquad \zik{t-1}^T\iwk{k}\zik{t-1} - 2\zik{t-1}^T\iwk{k}F\zik{t-2} + \zik{t-2}^TF^T\iwk{k}F\zik{t-2}\; - \\
+ &\qquad\qquad 2\zik{t-1}^T\iwk{k}Gu_{t-1} + 2\zik{t-2}^TF^T\iwk{k}Gu_{t-1} + u_{t-1}^TG^T\iwk{k}Gu_{t-1}\; + \\
+ & \Ik{t} \left(\yik{t}^T\ivk{k}\yik{t} -2 \zik{t}^T\ivk{k}H\yik{t} + \zik{t}^TH^T\ivk{k}H\zik{t} \right) + \\
+ &\qquad \zik{t}^T\iwk{k}\zik{t} - 2\zik{t}^T\iwk{k}F\zik{t-1} + \zik{t-1}^TF^T\iwk{k}F\zik{t-1}\; - \\
+ &\qquad\qquad 2\zik{t}^T\iwk{k}Gu_{t} + 2\zik{t-1}^TF^T\iwk{k}Gu_{t} + u_{t}^TG^T\iwk{k}Gu_{t} 
+ \biggr) \biggr] d z^t && 
+\end{flalign*}
+Taking out terms that are not marginalised over $\zik{i}$ and rearranging gives:
+\begin{flalign*}
+ \left( \lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) & \exp \left[-\frac{1}{2} \biggl(\sum_{i = 1}^T \Ik{i} \yik{i}^T\ivk{k}\yik{i} + u_{i}^TG^T\iwk{k}Gu_{i} + \mik{0}\iwk{0}\mik{0} \biggr)\right] \cdot \\ 
+ \lint \exp \biggl[ -\frac{1}{2} \biggl(
+  &\zik{0}^T \iwk{0} \zik{0} + \zik{0}^TF^T\iwk{k}F\zik{0} - 2\mik{0}^T\iwk{0}\zik{0} - \\
+  & \qquad 2\zik{1}^T\iwk{k}F\zik{0} + 2u_1^TG^T\iwk{k}F\zik{0}\; +  \\
+ & \Ik{1}\left(-2 \zik{1}^T\ivk{k}H\yik{1} + \zik{1}^TH^T\ivk{k}H\zik{1}\right)\; + \\
+ &\qquad \zik{1}^T\iwk{k}\zik{1} + \zik{1}^TF^T\iwk{k}F\zik{1} - 2\zik{2}^T\iwk{k}F\zik{1} - \\
+ &\qquad\qquad 2\zik{1}^T\iwk{k}Gu_1 + 2\zik{1}^TF^T\iwk{k}Gu_2\; + \\
+ & \Ik{2} \left(-2 \zik{2}^T \ivk{k} H \yik{2} + \zik{2}^T H^T \ivk{k} H \zik{2} \right) + \\
+ &\qquad \zik{2}^T\iwk{k}\zik{2} - 2\zik{3}^T\iwk{k}F\zik{2} + \zik{2}^TF^T\iwk{k}F\zik{2}\; - \\
+ &\qquad\qquad 2\zik{2}^T\iwk{k}Gu_2 + 2\zik{2}^TF^T\iwk{k}Gu_3\; + \\
+ & \dots \; \; + \\
+ & \Ik{t-1} \left(-2 \zik{t-1}^T \ivk{k} H \yik{t-1} + \zik{t-1}^TH^T\ivk{k}H\zik{t-1} \right) + \\
+ &\qquad \zik{t-1}^T\iwk{k}\zik{t-1} - 2\zik{t}^T\iwk{k}F\zik{t-1} + \zik{t-1}^TF^T\iwk{k}F\zik{t-1}\; - \\
+ &\qquad\qquad 2\zik{t-1}^T\iwk{k}Gu_{t-1} + 2\zik{t-1}^TF^T\iwk{k}Gu_t\; + \\
+  & \Ik{t} \left(-2\zik{t}^T\ivk{k}H\yik{t} + \zik{t}^TH^T\ivk{k}H\zik{t} \right) + \\
+ &\qquad \zik{t}^T\iwk{k}\zik{t} - 2\zik{t}^T\iwk{k}Gu_{t}\biggr) \biggr] d z^t &&
+\end{flalign*}
+after a bit more rearranging and concentrating again on the integral:
+\begin{flalign*}
+ \lint \exp \biggl[ -\frac{1}{2} \biggl( 
+  &\zik{0}^T \left(\iwk{0} + F^T\iwk{k}F\right) \zik{0}\; - \\ 
+  & \qquad 2\left(\mik{0}^T\iwk{0} + \zik{1}^T\iwk{k}F - u_1^TG^T\iwk{k}F\right)\zik{0}\; + \\
+  &\zik{1}^T\left(\iwk{k} + F^T\iwk{k}F + \Ik{1}H^T\ivk{k}H\right)\zik{1}\; - \\
+ &\qquad 2\left(\Ik{1}\ivk{k}H\yik{1} + \iwk{k}Gu_1 + \zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F\right)\zik{1}\; + \\
+ &\zik{2}^T\left(\iwk{k} + F^T\iwk{k}F + \Ik{2}H^T\ivk{k}H\right)\zik{2}\; - \\
+ &\qquad 2\left(\Ik{2}\ivk{k}H\yik{2} + \iwk{k}Gu_2 + \zik{3}^T\iwk{k}F - u_3^TG^T\iwk{k}F\right)\zik{2}\; + \\
+ & \dots \; \; + \\
+ &\zik{t-1}^T\left(\iwk{k} + F^T\iwk{k}F + \Ik{t-1}H^T\ivk{k}H\right)\zik{t-1}\; - \\
+ &\qquad 2\left(\Ik{t-1}\ivk{k}H\yik{t-1} + \iwk{k}Gu_{t-1} + \zik{t}^T\iwk{k}F - u_t^TG^T\iwk{k}F\right)\zik{t-1}\; + \\ 
+ &\zik{t}^T\left(\iwk{k} + \Ik{t}H^T\ivk{k}H\right)\zik{t}\; - \\
+ &\qquad 2\left(\Ik{t}\ivk{k}H\yik{t} + \iwk{k}Gu_{t} \right)\zik{t}\;\biggr) \biggr] d z^t &&
+\end{flalign*}
+Now for each $i$ there is an equation of the form $z^T A z - 2b^Tz$ which means we can complete the square and integrate for each $i$ as follows:
+\begin{flalign}
+\label{eq:if_compsq}
+&\int_{-\infty}^{\infty} \exp \bigg[-\frac{1}{2} \left(z^TAz - 2b^Tz \right) \bigg]dz = (|2\pi A|)^{\frac{1}{2}} \exp \bigg[\frac{1}{2} b^TA^{-1}b \bigg]. &&
+\end{flalign}
+So let $A_0 = \left(\iwk{0} + F^T\iwk{k}F\right)$ and $b_0^T = \left(\mik{0}^T\iwk{0} + \zik{1}^T\iwk{k}F - Gu_1^T\iwk{k}F\right)^T$ then we integrate over each $z_i$. Notice that $b_0$ contains a $\zik{1}$ term (treated as a constant w.r.t $\zik{0}$) so it needs to be expanded, rearranged and marginalised out in the next step. Focusing on the expansion of $\exp \left[\frac{1}{2} b^T_0A_0b_0 \right]$ and also letting $d_0 = \mik{0}^T\iwk{0}$:
+\begin{flalign*}
+\exp &\bigg[\frac{1}{2} \left(d_0 + \zik{1}^T\iwk{k}F - u_1^TG^T\iwk{k}F\right)^TA_0^{-1}\left(d_0 + \zik{1}^T\iwk{k}F - u_1^TG^T\iwk{k}F\right)  \bigg] \\
+= & \exp \bigg[\frac{1}{2} \left(d_0^TA_0^{-1}d_0 - 2d_0^TA_0^{-1}F^T\iwk{k}Gu_1 + u_1^TG^T\iwk{k}FA_0^{-1}F^T\iwk{k}Gu_1 \right) \bigg] \cdot \\
+  & \exp \bigg[\frac{1}{2} \biggl(\zik{1}^T\iwk{k}FA_0^{-1}F^T\iwk{k}\zik{1}  - 2\zik{1}^T\iwk{k}FA_0^{-1}F^T\iwk{k}Gu_1 + 2d_0^TA_0^{-1}F^T\iwk{k}\zik{1} \biggr) \bigg] &&
+\end{flalign*}
+A brief summary of the calculation so far shows:
+\begin{flalign}
+\label{eq:if_sumcalc}
+&\left(\lprod_{i = 1}^t \frac{1}{|\vk|^{\Ik{i}}} \right) \exp \left[-\frac{1}{2} \biggl(\sum_{i = 1}^T \Ik{i} \yik{i}^T\ivk{k}\yik{i} + u_{i}^TG^T\iwk{k}Gu_{i} + \mik{0}\iwk{0}\mik{0} \biggr)\right] \cdot \\ 
+ &(|2\pi A_0|)^{\frac{1}{2}}\exp \bigg[\frac{1}{2}(d_0-F^T\iwk{k}Gu_1)^TA_0^{-1}(d_0-F^T\iwk{k}Gu_1) \bigg] \cdot \\ 
+ &\lint \exp \biggl[-\frac{1}{2} \biggl(-\zik{1}^T\iwk{k}FA_0^{-1}F^T\iwk{k}\zik{1}-2d_0^TA_0^{-1}F^T\iwk{k}\zik{1} + \\
+ &\qquad 2u_1^TG^T\iwk{k}FA_0^{-1}F^T\iwk{k}\zik{1} + \zik{1}^T\left(\iwk{k} + F^T\iwk{k}F + \Ik{1}H^T\ivk{k}H\right)\zik{1}\; - \\
+ &\qquad\qquad 2\left(\Ik{1}\ivk{k}H\yik{1} + \iwk{k}Gu_1 + \zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F\right)\zik{1}\; \biggr) \bigg] \cdot \\
+  &\qquad\qquad\qquad \bigg[-\frac{1}{2} \left(\; \dots \; \right) \bigg] d\zik{1} \dots d\zik{t} && 
+\end{flalign}
+Another expansion and rearrangement gives us (inside the integral):
+\begin{flalign}
+\label{eq:if_compiter}
+&\exp \bigg[ -\frac{1}{2} \bigg(\zik{1}^T\left(\iwk{k} + F^T\iwk{k}F + \Ik{1}H^T\ivk{k}H - \iwk{k}FA_0^{-1}F^T\iwk{k}\right)\zik{1} - \\ \nonumber
+&\qquad2\bigg(\Ik{1}\ivk{k}H\yik{1} + d_0^TA_0^{-1}F^T\iwk{k} + \iwk{k}Gu_1 - \iwk{k}FA_0^{-1}F^T\iwk{k}Gu_1 + \\ \nonumber
+&\qquad\qquad\zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F \bigg)\zik{1}\bigg) \bigg]&&
+\end{flalign}
+Letting:
+\begin{flalign}
+\label{eq:if_compiter1}
+&A_1 = \left(\iwk{k} + F^T\iwk{k}F + \Ik{1}H^T\ivk{k}H - \iwk{k}FA_0^{-1}F^T\iwk{k}\right) \\ \nonumber
+&b_1^T = \left(d_1 + \zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F \right)^T \\ \nonumber
+&d_1 = \left(\Ik{1}\ivk{k}H\yik{1} + d_0^TA_0^{-1}F^T\iwk{k} + \left(\iwk{k} - \iwk{k}FA_0^{-1}F^T\iwk{k}\right)Gu_1\right)&&
+\end{flalign}
+we can complete the square again, getting from the second part of Equation \eqref{eq:if_compsq}:
+\begin{flalign}
+\label{eq:if_compiter2}
+\exp & \bigg[\frac{1}{2} b_1^T A_1 b_1 \bigg] = \\ \nonumber
+\exp &\bigg[\frac{1}{2} \left(d_1 + \zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F \right)^TA_1^{-1}\left(d_1 + \zik{2}^T\iwk{k}F - u_2^TG^T\iwk{k}F \right)  \bigg] \\ \nonumber
+= & \exp \bigg[\frac{1}{2} \left(d_1^TA_1^{-1}d_1 - 2d_1^TA_1^{-1}F^T\iwk{k}Gu_2 + u_2^TG^T\iwk{k}FA_1^{-1}F^T\iwk{k}Gu_2 \right) \bigg] \cdot \\
+  & \exp \bigg[\frac{1}{2} \biggl(\zik{1}^T\iwk{k}FA_1^{-1}F^T\iwk{k}\zik{1}  - 2u_2^TG^T\iwk{k}FA_1^{-1}F^T\iwk{k}\zik{1} + 2d_1^TA_1^{-1}F^T\iwk{k}\zik{1} \biggr) \bigg] &&
+\end{flalign}
+Notice that this has exactly the same form as Equation \eqref{eq:if_compiter}. Iterating the process in Equations \eqref{eq:if_compiter} to \eqref{eq:if_compiter2} for each $t$ in $1 \dots t$
+will produce:
+\begin{flalign*}
+&p(T \giv y^t) = \\ 
+&p(T) \lprod^{K_T}_{k = 1} \lint p(\zik{0}) \lprod_{i = 1}^t p(y_i \giv \zik{i}, T)^{\Ik{i}}p(\zik{i} \giv \zik{i-1}, u_t, T) dz^t_k = \\ \nonumber
+&p(T)(|2\pi W_0|)^{-\frac{1}{2}}\exp \bigg[-\frac{1}{2} \biggl(\mik{0}\iwk{0}\mik{0} - d_0^TA_i^{-1}d_0 \biggr) \bigg]\lprod^{K_T}_{k = 1}\left(\lprod_{i = 1}^t(|2\pi A_i|)^{\frac{1}{2}}(|2\pi\wk |)^{-\frac{1}{2}}(|2\pi\vk|)^{\frac{-\Ik{i}}{2}}\right)\cdot \\
+ &\exp \bigg[-\frac{1}{2} \biggl(\sum_{i = 1}^t \Ik{i} \yik{i}^T\ivk{k}\yik{i} + 2d_{i-1}^TA_{i-1}^{-1}F^T\iwk{k}Gu_i + u_{i}^TG^T(\iwk{k} - \iwk{k}FA_{i-1}^{-1}F^T\iwk{k})Gu_i - d_i^TA_i^{-1}d_i \biggr) \bigg] && 
+\end{flalign*}
+Where 
+\begin{flalign*}
+&A_0 = \left(\iwk{0} + F^T\iwk{k}F\right) \\
+&b_0^T = \left(d_0 + \zik{1}^T\iwk{k}F - Gu_1^T\iwk{k}F\right)^T \\
+&d_0 = \mik{0}^T\iwk{0} \\
+&A_i = \left(\iwk{k} + F^T\iwk{k}F + \Ik{i}H^T\ivk{k}H - \iwk{k}FA_{i-1}^{-1}F^T\iwk{k}\right) \\
+&b_i^T = \left(d_i + \zik{i+1}^T\iwk{k}F - u_{i+1}^TG^T\iwk{k}F \right)^T \\
+&d_i = \left(\Ik{i}\ivk{k}H\yik{i} + d_{i-1}^TA_{i-1}^{-1}F^T\iwk{k} + \left(\iwk{k} - \iwk{k}FA_{i-1}^{-1}F^T\iwk{k}\right)Gu_i\right)\\
+&A_t = \left(\iwk{k} + \Ik{t}H^T\ivk{k}H - \iwk{k}FA_{t-1}^{-1}F^T\iwk{k}\right) \\
+&b_t^T = d_t^T \\
+&d_t = \left(\Ik{t}\ivk{k}H\yik{t} + d_{t-1}^TA_{t-1}^{-1}F^T\iwk{k} + \left(\iwk{k} - \iwk{k}FA_{t-1}^{-1}F^T\iwk{k}\right)Gu_t\right)&&
+\end{flalign*}
+There are efficient methods for multiplying symmetric, positive definite matrices in a numerically stable manner using Cholesky decomposition but this is yet to be implemented.

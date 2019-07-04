@@ -1,0 +1,59 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.9 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nty/global//global/global}
+    \entry{singpur}{article}{}
+      \name{author}{2}{}{%
+        {{hash=d0204ab685af89ac2f32a4acc216f819}{%
+           family={Meinhold},
+           familyi={M\bibinitperiod},
+           given={Richard\bibnamedelima J},
+           giveni={R\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=16d91e94b600053f40e8aeea86271a35}{%
+           family={Singpurwalla},
+           familyi={S\bibinitperiod},
+           given={Nozer\bibnamedelima D},
+           giveni={N\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Taylor \& Francis Group}%
+      }
+      \strng{namehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{fullhash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{bibnamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authorbibnamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authornamehash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \strng{authorfullhash}{d865f5ddcb4ffab76d7cce8d2839066d}
+      \field{sortinit}{M}
+      \field{sortinithash}{cfd219b90152c06204fab207bc6c7cab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The American Statistician}
+      \field{number}{2}
+      \field{title}{Understanding the Kalman filter}
+      \field{volume}{37}
+      \field{year}{1983}
+      \field{pages}{123\bibrangedash 127}
+      \range{pages}{5}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

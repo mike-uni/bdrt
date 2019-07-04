@@ -1,0 +1,17 @@
+[0] Config.pm:302> INFO - This is Biber 2.9
+[0] Config.pm:305> INFO - Logfile is 'bisp_bdrt.blg'
+[17] biber:313> INFO - === Tue Jun 11, 2019, 17:49:16
+[33] Biber.pm:371> INFO - Reading 'bisp_bdrt.bcf'
+[76] Biber.pm:857> INFO - Found 10 citekeys in bib section 0
+[85] Biber.pm:3981> INFO - Processing section 0
+[93] Biber.pm:4154> INFO - Looking for bibtex format file 'bdrt.bib' for section 0
+[94] bibtex.pm:1468> INFO - LaTeX decoding ...
+[118] bibtex.pm:1294> INFO - Found BibTeX data source 'bdrt.bib'
+[159] Utils.pm:169> WARN - month field 'April' in entry 'mehra' is not an integer - this will probably not sort properly.
+[174] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[174] UCollate.pm:68> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[174] Biber.pm:3809> INFO - Sorting list 'nyt/global//global/global' of type 'entry' with template 'nyt' and locale 'en-US'
+[175] Biber.pm:3815> INFO - No sort tailoring available for locale 'en-US'
+[183] bbl.pm:617> INFO - Writing 'bisp_bdrt.bbl' with encoding 'ascii'
+[190] bbl.pm:720> INFO - Output to bisp_bdrt.bbl
+[190] Biber.pm:110> INFO - WARNINGS: 1
